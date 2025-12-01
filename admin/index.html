@@ -4,150 +4,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Done & Dusted</title>
-
-    <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Admin Login | Done & Dusted</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Styles -->
-    <link rel="stylesheet" href="dashboard.css">
-    <link rel="stylesheet" href="../assistant/assistant.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h2>Done & Dusted</h2>
-        </div>
-        <nav class="sidebar-nav">
-            <ul>
-                <li class="active" data-target="overview">
-                    <i class="fas fa-th-large"></i> Overview
-                </li>
-                <li data-target="bookings">
-                    <i class="fas fa-calendar-check"></i> Bookings
-                </li>
-                <li data-target="clients">
-                    <i class="fas fa-users"></i> Clients
-                </li>
-                <li data-target="messages">
-                    <i class="fas fa-envelope"></i> Messages
-                </li>
-                <li data-target="settings">
-                    <i class="fas fa-cog"></i> Settings
-                </li>
-            </ul>
-        </nav>
-        <div class="sidebar-footer">
-            <button id="logout-btn" class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-        </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Topbar -->
-        <header class="topbar">
-            <div id="menu-toggle" class="menu-toggle">
-                <i class="fas fa-bars"></i>
+    <section class="login-section">
+        <div class="login-card">
+            <div class="login-header">
+                <h2>Admin Login</h2>
+                <p>Please sign in to continue</p>
             </div>
-            <h3>Dashboard</h3>
-            <div class="user-profile">
-                <span>Admin</span>
-                <div class="avatar-circle"><i class="fas fa-user-circle" style="font-size: 35px; color: #ccc;"></i>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" required placeholder="admin@doneanddusted.co.uk">
                 </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+            <div style="margin-top: 20px; text-align: center;">
+                <a href="../index.html" class="view-all">Back to Website</a>
             </div>
-        </header>
-
-        <!-- Content Area -->
-        <div class="content-area">
-
-            <!-- Overview Section -->
-            <section id="overview" class="view-section active">
-                <div class="section-header">
-                    <h2>Overview</h2>
-                </div>
-                <div class="stats-grid">
-                    <div class="card">
-                        <div class="card-icon icon-blue">
-                            <i class="fas fa-calendar-check"></i>
-                        </div>
-                        <div class="card-info">
-                            <h3>12</h3>
-                            <p>Total Bookings</p>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon icon-green">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="card-info">
-                            <h3>8</h3>
-                            <p>Completed</p>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon icon-orange">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="card-info">
-                            <h3>4</h3>
-                            <p>Pending</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Bookings Section -->
-            <section id="bookings" class="view-section">
-                <div class="section-header">
-                    <h2>Bookings Management</h2>
-                </div>
-                <div class="card">
-                    <p>Booking list will appear here.</p>
-                </div>
-            </section>
-
-            <!-- Clients Section -->
-            <section id="clients" class="view-section">
-                <div class="section-header">
-                    <h2>Clients</h2>
-                </div>
-                <div class="card">
-                    <p>Client list will appear here.</p>
-                </div>
-            </section>
-
-            <!-- Messages Section -->
-            <section id="messages" class="view-section">
-                <div class="section-header">
-                    <h2>Messages</h2>
-                </div>
-                <div class="card">
-                    <p>No new messages.</p>
-                </div>
-            </section>
-
-            <!-- Settings Section -->
-            <section id="settings" class="view-section">
-                <div class="section-header">
-                    <h2>Settings</h2>
-                </div>
-                <div class="card">
-                    <p>Admin settings configuration.</p>
-                </div>
-            </section>
-
         </div>
-    </main>
-
-    <!-- Scripts -->
-    <script src="dashboard.js"></script>
-    <script src="../assistant/assistant.js"></script>
+    </section>
+    <script src="script.js"></script>
 </body>
 
 </html>
