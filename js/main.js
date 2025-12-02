@@ -45,47 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Section Headers Animation ---
-    gsap.utils.toArray('.section-header').forEach(header => {
-        gsap.from(header, {
-            scrollTrigger: {
-                trigger: header,
-                start: "top 80%",
-                toggleActions: "play none none reverse"
-            },
-            y: 30,
-            opacity: 0,
-            duration: 0.8,
-            ease: "power3.out"
-        });
-    });
-
-    // --- Service Cards Stagger Animation ---
-    gsap.from('.service-card', {
-        scrollTrigger: {
-            trigger: '.services-grid',
-            start: "top 75%"
-        },
-        y: 50,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: "power3.out"
-    });
-
-    // --- Features Stagger Animation ---
-    gsap.from('.feature-item', {
-        scrollTrigger: {
-            trigger: '.features-grid',
-            start: "top 80%"
-        },
-        x: -30,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: "power2.out"
-    });
-
     // --- Founder Section Animation ---
     gsap.from('.founder-image', {
         scrollTrigger: {
@@ -108,19 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
         duration: 1,
         delay: 0.2,
         ease: "power3.out"
-    });
-
-    // --- Testimonials Animation ---
-    gsap.from('.testimonial-card', {
-        scrollTrigger: {
-            trigger: '.testimonials-grid',
-            start: "top 80%"
-        },
-        y: 40,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.2,
-        ease: "back.out(1.2)"
     });
 
     // --- Navbar Scroll Effect ---
