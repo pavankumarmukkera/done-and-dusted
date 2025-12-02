@@ -2,43 +2,48 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Done and Dusted Hertfordshire | Premier Cleaning Services</title>
     <meta name="description"
         content="Professional cleaning services in Hertfordshire. Domestic, commercial, deep cleaning, EOT, AirBnB, and HMO. Book your service today!">
-
-    <!-- Fonts -->
+    <meta name="keywords"
+        content="cleaning services, Hertfordshire, domestic cleaning, commercial cleaning, deep clean, end of tenancy, airbnb cleaning, HMO maintenance">
+    <meta name="author" content="Done and Dusted Hertfordshire">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@500;600;700&display=swap"
-        <header class="header">
-    <div class="container nav-container">
-        <a href="#" class="logo">
-            <span class="logo-text">Done & Dusted</span>
-            <span class="logo-sub">Hertfordshire</span>
-        </a>
-        <nav class="navbar">
-            <ul class="nav-links">
-                <li><a href="#hero">Home</a></li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#gallery">Gallery</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#loyalty">Loyalty</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li><a href="#booking" class="btn btn-primary">Book Now</a></li>
-            </ul>
-            <div class="hamburger">
-                <i class="fas fa-bars"></i>
-            </div>
-        </nav>
-    </div>
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container nav-container">
+            <a href="#hero" class="logo">
+                <span class="logo-text">Done &amp; Dusted</span>
+                <span class="logo-sub">Hertfordshire</span>
+            </a>
+            <nav class="navbar">
+                <ul class="nav-links">
+                    <li><a href="#hero">Home</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#booking">Book Now</a></li>
+                    <li><a href="admin.html">Admin Login</a></li>
+                </ul>
+                <div class="hamburger" aria-label="Toggle navigation menu"><i class="fas fa-bars"></i></div>
+            </nav>
+        </div>
     </header>
 
     <main>
+        <!-- Hero -->
         <section id="hero" class="hero">
             <div class="hero-bg-overlay"></div>
             <div class="container hero-content">
@@ -49,15 +54,9 @@
                     <a href="#services" class="btn btn-secondary">View Services</a>
                 </div>
             </div>
-            <div class="hero-wave">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-                    <path fill="#F7FAFC" fill-opacity="1"
-                        d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z">
-                    </path>
-                </svg>
-            </div>
         </section>
 
+        <!-- Services -->
         <section id="services" class="services section-padding">
             <div class="container">
                 <div class="section-header text-center" data-aos="fade-up">
@@ -66,134 +65,100 @@
                 </div>
                 <div class="services-grid">
                     <div class="service-card" data-aos="fade-up" data-aos-delay="100">
-                        <div class="service-img">
-                            <img src="assets/images/domestic-cleaning.png" alt="Domestic Cleaning">
-                        </div>
-                        <div class="service-content">
-                            <div class="icon-box"><i class="fas fa-home"></i></div>
-                            <h3>Domestic Cleaning</h3>
-                            <p>Regular home cleaning to keep your living space fresh and tidy.</p>
-                        </div>
+                        <div class="icon-box"><i class="fas fa-home"></i></div>
+                        <h3>Domestic Cleaning</h3>
+                        <p>Regular home cleaning to keep your living space fresh and tidy.</p>
                     </div>
                     <div class="service-card" data-aos="fade-up" data-aos-delay="200">
-                        <div class="service-img">
-                            <img src="assets/images/commercial-cleaning.png" alt="Commercial Cleaning">
-                        </div>
-                        <div class="service-content">
-                            <div class="icon-box"><i class="fas fa-building"></i></div>
-                            <h3>Commercial Cleaning</h3>
-                            <p>Office and workspace maintenance for a professional business environment.</p>
-                        </div>
+                        <div class="icon-box"><i class="fas fa-building"></i></div>
+                        <h3>Commercial Cleaning</h3>
+                        <p>Office and workspace maintenance for a professional business environment.</p>
                     </div>
                     <div class="service-card" data-aos="fade-up" data-aos-delay="300">
-                        <div class="service-img">
-                            <img src="assets/images/deep-clean.png" alt="Deep Cleans">
-                        </div>
-                        <div class="service-content">
-                            <div class="icon-box"><i class="fas fa-magic"></i></div>
-                            <h3>Deep Cleans</h3>
-                            <p>Intensive cleaning reaching every corner, perfect for spring cleaning.</p>
-                        </div>
+                        <div class="icon-box"><i class="fas fa-magic"></i></div>
+                        <h3>Deep Cleans</h3>
+                        <p>Intensive cleaning reaching every corner, perfect for spring cleaning.</p>
                     </div>
                     <div class="service-card" data-aos="fade-up" data-aos-delay="400">
-                        <div class="service-img">
-                            <img src="assets/images/end-of-tenancy.png" alt="End of Tenancy">
-                        </div>
-                        <div class="service-content">
-                            <div class="icon-box"><i class="fas fa-key"></i></div>
-                            <h3>End of Tenancy</h3>
-                            <p>Guaranteed pass-rate cleaning for tenants moving out and landlords.</p>
-                        </div>
+                        <div class="icon-box"><i class="fas fa-key"></i></div>
+                        <h3>End of Tenancy</h3>
+                        <p>Guaranteed pass-rate cleaning for tenants moving out and landlords.</p>
                     </div>
                     <div class="service-card" data-aos="fade-up" data-aos-delay="500">
-                        <div class="service-img">
-                            <img src="assets/images/domestic-cleaning.png" alt="AirBnB Cleaning">
-                        </div>
-                        <div class="service-content">
-                            <div class="icon-box"><i class="fas fa-suitcase"></i></div>
-                            <h3>AirBnB Cleaning</h3>
-                            <p>Reliable turnover service to ensure 5-star reviews from your guests.</p>
-                        </div>
+                        <div class="icon-box"><i class="fas fa-suitcase"></i></div>
+                        <h3>AirBnB Cleaning</h3>
+                        <p>Reliable turnover service to ensure 5‑star reviews from your guests.</p>
                     </div>
                     <div class="service-card" data-aos="fade-up" data-aos-delay="600">
-                        <div class="service-img">
-                            <img src="assets/images/end-of-tenancy.png" alt="HMO Maintenance">
-                        </div>
-                        <div class="service-content">
-                            <div class="icon-box"><i class="fas fa-users"></i></div>
-                            <h3>HMO Maintenance</h3>
-                            <p>Communal area cleaning for Houses in Multiple Occupation.</p>
-                        </div>
+                        <div class="icon-box"><i class="fas fa-users"></i></div>
+                        <h3>HMO Maintenance</h3>
+                        <p>Communal area cleaning for Houses in Multiple Occupation.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="gallery" class="gallery section-padding bg-light">
+        <!-- About -->
+        <section id="about" class="about section-padding bg-light">
             <div class="container">
                 <div class="section-header text-center" data-aos="fade-up">
-                    <div class="section-header text-center" data-aos="fade-up">
-                        <h2 class="section-title">Why Choose Us?</h2>
-                        <p class="section-subtitle">Excellence in every detail</p>
+                    <h2 class="section-title">Why Choose Us?</h2>
+                    <p class="section-subtitle">Excellence in every detail</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-item" data-aos="fade-right" data-aos-delay="100">
+                        <div class="feature-icon"><i class="fas fa-user-check"></i></div>
+                        <h4>Experienced &amp; Vetted Staff</h4>
+                        <p>Our team is fully trained, background‑checked, and insured for your peace of mind.</p>
                     </div>
-                    <div class="features-grid">
-                        <div class="feature-item" data-aos="fade-right" data-aos-delay="100">
-                            <div class="feature-icon"><i class="fas fa-user-check"></i></div>
-                            <h4>Experienced & Vetted Staff</h4>
-                            <p>Our team is fully trained, background-checked, and insured for your peace of mind.</p>
-                        </div>
-                        <div class="feature-item" data-aos="fade-left" data-aos-delay="200">
-                            <div class="feature-icon"><i class="fas fa-leaf"></i></div>
-                            <h4>Eco-Friendly Products</h4>
-                            <p>We use safe, environmentally friendly products upon request to protect your home and
-                                planet.
-                            </p>
-                        </div>
-                        <div class="feature-item" data-aos="fade-right" data-aos-delay="300">
-                            <div class="feature-icon"><i class="fas fa-star"></i></div>
-                            <h4>100% Satisfaction</h4>
-                            <p>We are committed to high standards. If you're not happy, we'll make it right.</p>
-                        </div>
-                        <div class="feature-item" data-aos="fade-left" data-aos-delay="400">
-                            <div class="feature-icon"><i class="fas fa-tags"></i></div>
-                            <h4>Competitive Pricing</h4>
-                            <p>Premium service at affordable rates, with no hidden costs or surprises.</p>
-                        </div>
+                    <div class="feature-item" data-aos="fade-left" data-aos-delay="200">
+                        <div class="feature-icon"><i class="fas fa-leaf"></i></div>
+                        <h4>Eco‑Friendly Products</h4>
+                        <p>We use safe, environmentally friendly products upon request to protect your home and planet.
+                        </p>
+                    </div>
+                    <div class="feature-item" data-aos="fade-right" data-aos-delay="300">
+                        <div class="feature-icon"><i class="fas fa-star"></i></div>
+                        <h4>100% Satisfaction</h4>
+                        <p>We are committed to high standards. If you're not happy, we'll make it right.</p>
+                    </div>
+                    <div class="feature-item" data-aos="fade-left" data-aos-delay="400">
+                        <div class="feature-icon"><i class="fas fa-tags"></i></div>
+                        <h4>Competitive Pricing</h4>
+                        <p>Premium service at affordable rates, with no hidden costs or surprises.</p>
                     </div>
                 </div>
+            </div>
         </section>
 
-        <section id="founder" class="founder section-padding bg-light">
+        <!-- Founder -->
+        <section id="founder" class="founder section-padding">
             <div class="container">
                 <div class="founder-content" data-aos="fade-up">
                     <div class="founder-image">
-                        <img src="assets/images/founder-megan.jpg" alt="Megan Sciorio">
+                        <img src="assets/images/founder-megan.jpg" alt="Megan Sciorio - Founder">
                     </div>
                     <div class="founder-text">
                         <i class="fas fa-quote-left quote-icon"></i>
                         <h3>Meet the Founder</h3>
-                        <p class="founder-quote">"At Done and Dusted Hertfordshire, we’re passionate about
-                            providing
-                            spotless cleaning with care and attention to detail. What started as a small local
-                            service
-                            has grown through trust, consistency, and a personal touch. We believe every home
-                            and
-                            workspace deserves a shine that brings peace of mind — because a clean space creates
-                            a clear
+                        <p class="founder-quote">"At Done and Dusted Hertfordshire, we're passionate about providing
+                            spotless cleaning with care and attention to detail. What started as a small local service
+                            has grown through trust, consistency, and a personal touch. We believe every home and
+                            workspace deserves a shine that brings peace of mind — because a clean space creates a clear
                             head."</p>
-                        <p class="founder-name">— Megan Sciorio, Owner & Manager</p>
+                        <p class="founder-name">— Megan Sciorio, Owner &amp; Manager</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="loyalty" class="loyalty section-padding">
+        <!-- Loyalty -->
+        <section id="loyalty" class="loyalty section-padding bg-light">
             <div class="container">
                 <div class="loyalty-card" data-aos="flip-up">
                     <div class="loyalty-content">
                         <h2>Loyalty Program</h2>
-                        <p>We value our regular customers! Collect 5 cleans and get 10% off your next service.
-                        </p>
+                        <p>Collect 5 cleans and get 10% off your next service.</p>
                         <div class="stamps">
                             <div class="stamp filled"><i class="fas fa-check"></i></div>
                             <div class="stamp filled"><i class="fas fa-check"></i></div>
@@ -208,7 +173,8 @@
             </div>
         </section>
 
-        <section id="testimonials" class="testimonials section-padding bg-light">
+        <!-- Testimonials -->
+        <section id="testimonials" class="testimonials section-padding">
             <div class="container">
                 <div class="section-header text-center" data-aos="fade-up">
                     <h2 class="section-title">Happy Customers</h2>
@@ -217,29 +183,26 @@
                 <div class="testimonials-grid">
                     <div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
                         <div class="stars">★★★★★</div>
-                        <p>"Absolutely amazing service. My house has never looked this clean! The team was
-                            professional
+                        <p>"Absolutely amazing service. My house has never looked this clean! The team was professional
                             and friendly."</p>
                         <div class="client-info">
-                            <img src="assets/images/testimonial-sarah.png" alt="Client">
+                            <img src="assets/images/testimonial-sarah.png" alt="Sarah Jenkins">
                             <h4>Sarah Jenkins</h4>
                         </div>
                     </div>
                     <div class="testimonial-card" data-aos="fade-up" data-aos-delay="200">
                         <div class="stars">★★★★★</div>
-                        <p>"Used them for an End of Tenancy clean. Got my full deposit back. Highly
-                            recommended!"</p>
+                        <p>"Used them for an End of Tenancy clean. Got my full deposit back. Highly recommended!"</p>
                         <div class="client-info">
-                            <img src="assets/images/testimonial-mike.jpg" alt="Client">
+                            <img src="assets/images/testimonial-mike.jpg" alt="Mike Thompson">
                             <h4>Mike Thompson</h4>
                         </div>
                     </div>
                     <div class="testimonial-card" data-aos="fade-up" data-aos-delay="300">
                         <div class="stars">★★★★★</div>
-                        <p>"Reliable, thorough, and great value. I use them for my office cleaning every week."
-                        </p>
+                        <p>"Reliable, thorough, and great value. I use them for my office cleaning every week."</p>
                         <div class="client-info">
-                            <img src="assets/images/testimonial-emma.jpg" alt="Client">
+                            <img src="assets/images/testimonial-emma.jpg" alt="Emma Wilson">
                             <h4>Emma Wilson</h4>
                         </div>
                     </div>
@@ -247,7 +210,8 @@
             </div>
         </section>
 
-        <section id="booking" class="booking section-padding">
+        <!-- Booking Form -->
+        <section id="booking" class="booking section-padding bg-light">
             <div class="container">
                 <div class="booking-container" data-aos="zoom-in">
                     <div class="booking-header text-center">
@@ -272,7 +236,8 @@
                             </div>
                             <div class="form-group">
                                 <label for="service">Service Required</label>
-                                <select id="service" name="service">
+                                <select id="service" name="service" required>
+                                    <option value="">Select a service</option>
                                     <option value="Domestic Cleaning">Domestic Cleaning</option>
                                     <option value="Commercial Cleaning">Commercial Cleaning</option>
                                     <option value="Deep Clean">Deep Clean</option>
@@ -297,8 +262,13 @@
             </div>
         </section>
 
+        <!-- Contact -->
         <section id="contact" class="contact section-padding">
             <div class="container">
+                <div class="section-header text-center" data-aos="fade-up">
+                    <h2 class="section-title">Get in Touch</h2>
+                    <p class="section-subtitle">We're here to help with all your cleaning needs</p>
+                </div>
                 <div class="contact-wrapper" data-aos="fade-up">
                     <div class="contact-card">
                         <i class="fas fa-phone-alt"></i>
@@ -314,30 +284,31 @@
                     <div class="contact-card">
                         <i class="fab fa-instagram"></i>
                         <h3>Follow Us</h3>
-                        <p><a href="https://instagram.com/doneanddustedhertfordshire_"
-                                target="_blank">@doneanddustedhertfordshire_</a></p>
+                        <p><a href="https://instagram.com/doneanddustedhertfordshire_" target="_blank"
+                                rel="noopener noreferrer">@doneanddustedhertfordshire_</a></p>
                     </div>
                     <div class="contact-card">
                         <i class="fab fa-facebook-f"></i>
                         <h3>Like Us</h3>
-                        <p><a href="#" target="_blank">Done and Dusted Hertfordshire</a></p>
+                        <p><a href="#" target="_blank" rel="noopener noreferrer">Done and Dusted Hertfordshire</a></p>
                     </div>
                 </div>
                 <div class="map-container" data-aos="fade-up" data-aos-delay="200">
                     <iframe
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d158858.47340002653!2d-0.2276542867887623!3d51.8003644507962!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4876360015538063%3A0x64d6339662764b7!2sHertfordshire%2C%20UK!5e0!3m2!1sen!2sus!4v1685123456789!5m2!1sen!2sus"
                         width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        referrerpolicy="no-referrer-when-downgrade" title="Hertfordshire Location Map"></iframe>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-brand">
-                    <h3>Done & Dusted</h3>
+                    <h3>Done &amp; Dusted</h3>
                     <p>Hertfordshire's Premier Cleaning Service</p>
                 </div>
                 <div class="footer-nav">
@@ -345,229 +316,33 @@
                     <ul>
                         <li><a href="#hero">Home</a></li>
                         <li><a href="#services">Services</a></li>
-                        <li><a href="#gallery">Gallery</a></li>
+                        <li><a href="#about">About</a></li>
                         <li><a href="#booking">Book Now</a></li>
-                        <li><a href="admin/index.html">Admin Login</a></li>
+                        <li><a href="admin.html">Admin Login</a></li>
                     </ul>
                 </div>
                 <div class="footer-social">
                     <h4>Connect</h4>
                     <div class="social-icons">
-                        <a href="https://instagram.com/doneanddustedhertfordshire_" target="_blank"><i
+                        <a href="https://instagram.com/doneanddustedhertfordshire_" target="_blank"
+                            rel="noopener noreferrer" aria-label="Visit our Instagram page"><i
                                 class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Visit our Facebook page"><i class="fab fa-facebook-f"></i></a>
                     </div>
                 </div>
             </div>
             <div class="footer-bottom">
-                <div class="founder-content" data-aos="fade-up">
-                    <div class="founder-image">
-                        <img src="assets/images/founder-megan.jpg" alt="Megan Sciorio">
-                    </div>
-                    <div class="founder-text">
-                        <i class="fas fa-quote-left quote-icon"></i>
-                        <h3>Meet the Founder</h3>
-                        <p class="founder-quote">"At Done and Dusted Hertfordshire, we’re passionate about
-                            providing
-                            spotless cleaning with care and attention to detail. What started as a small local
-                            service
-                            has grown through trust, consistency, and a personal touch. We believe every home
-                            and
-                            workspace deserves a shine that brings peace of mind — because a clean space creates
-                            a clear
-                            head."</p>
-                        <p class="founder-name">— Megan Sciorio, Owner & Manager</p>
-                    </div>
-                </div>
+                <p>&copy; 2025 Done and Dusted Hertfordshire. All rights reserved. | Trusted cleaning services with a
+                    personal touch.</p>
             </div>
-            </section>
+        </div>
+    </footer>
 
-            <section id="loyalty" class="loyalty section-padding">
-                <div class="container">
-                    <div class="loyalty-card" data-aos="flip-up">
-                        <div class="loyalty-content">
-                            <h2>Loyalty Program</h2>
-                            <p>We value our regular customers! Collect 5 cleans and get 10% off your next service.
-                            </p>
-                            <div class="stamps">
-                                <div class="stamp filled"><i class="fas fa-check"></i></div>
-                                <div class="stamp filled"><i class="fas fa-check"></i></div>
-                                <div class="stamp"><i class="fas fa-spray-can"></i></div>
-                                <div class="stamp"><i class="fas fa-spray-can"></i></div>
-                                <div class="stamp"><i class="fas fa-spray-can"></i></div>
-                                <div class="stamp reward">10% OFF</div>
-                            </div>
-                            <a href="#booking" class="btn btn-primary">Book Your Next Clean</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="testimonials" class="testimonials section-padding bg-light">
-                <div class="container">
-                    <div class="section-header text-center" data-aos="fade-up">
-                        <h2 class="section-title">Happy Customers</h2>
-                        <p class="section-subtitle">What our clients say about us</p>
-                    </div>
-                    <div class="testimonials-grid">
-                        <div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
-                            <div class="stars">★★★★★</div>
-                            <p>"Absolutely amazing service. My house has never looked this clean! The team was
-                                professional
-                                and friendly."</p>
-                            <div class="client-info">
-                                <img src="assets/images/testimonial-sarah.png" alt="Client">
-                                <h4>Sarah Jenkins</h4>
-                            </div>
-                        </div>
-                        <div class="testimonial-card" data-aos="fade-up" data-aos-delay="200">
-                            <div class="stars">★★★★★</div>
-                            <p>"Used them for an End of Tenancy clean. Got my full deposit back. Highly
-                                recommended!"</p>
-                            <div class="client-info">
-                                <img src="assets/images/testimonial-mike.jpg" alt="Client">
-                                <h4>Mike Thompson</h4>
-                            </div>
-                        </div>
-                        <div class="testimonial-card" data-aos="fade-up" data-aos-delay="300">
-                            <div class="stars">★★★★★</div>
-                            <p>"Reliable, thorough, and great value. I use them for my office cleaning every week."
-                            </p>
-                            <div class="client-info">
-                                <img src="assets/images/testimonial-emma.jpg" alt="Client">
-                                <h4>Emma Wilson</h4>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="booking" class="booking section-padding">
-                <div class="container">
-                    <div class="booking-container" data-aos="zoom-in">
-                        <div class="booking-header text-center">
-                            <h2>Book Your Clean</h2>
-                            <p>Fill out the form below and we'll get back to you instantly.</p>
-                        </div>
-                        <form id="bookingForm" class="booking-form">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="name">Full Name</label>
-                                    <input type="text" id="name" name="name" required placeholder="John Doe">
-                                </div>
-                                <div class="form-group">
-                                    <label for="email">Email Address</label>
-                                    <input type="email" id="email" name="email" required placeholder="john@example.com">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="phone">Phone Number</label>
-                                    <input type="tel" id="phone" name="phone" required placeholder="07700 900000">
-                                </div>
-                                <div class="form-group">
-                                    <label for="service">Service Required</label>
-                                    <select id="service" name="service">
-                                        <option value="Domestic Cleaning">Domestic Cleaning</option>
-                                        <option value="Commercial Cleaning">Commercial Cleaning</option>
-                                        <option value="Deep Clean">Deep Clean</option>
-                                        <option value="End of Tenancy">End of Tenancy</option>
-                                        <option value="AirBnB Cleaning">AirBnB Cleaning</option>
-                                        <option value="HMO Cleaning">HMO Cleaning</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="date">Preferred Date</label>
-                                <input type="date" id="date" name="date" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="message">Additional Details</label>
-                                <textarea id="message" name="message" rows="4"
-                                    placeholder="Number of rooms, specific requests..."></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-submit">Request Quote</button>
-                        </form>
-                    </div>
-                </div>
-            </section>
-
-            <section id="contact" class="contact section-padding">
-                <div class="container">
-                    <div class="contact-wrapper" data-aos="fade-up">
-                        <div class="contact-card">
-                            <i class="fas fa-phone-alt"></i>
-                            <h3>Call Us</h3>
-                            <p><a href="tel:01923549026">01923 549026</a></p>
-                            <p><a href="tel:07782550292">07782 550292</a></p>
-                        </div>
-                        <div class="contact-card">
-                            <i class="fas fa-envelope"></i>
-                            <h3>Email Us</h3>
-                            <p><a href="mailto:info@doneanddusted.co.uk">info@doneanddusted.co.uk</a></p>
-                        </div>
-                        <div class="contact-card">
-                            <i class="fab fa-instagram"></i>
-                            <h3>Follow Us</h3>
-                            <p><a href="https://instagram.com/doneanddustedhertfordshire_"
-                                    target="_blank">@doneanddustedhertfordshire_</a></p>
-                        </div>
-                        <div class="contact-card">
-                            <i class="fab fa-facebook-f"></i>
-                            <h3>Like Us</h3>
-                            <p><a href="#" target="_blank">Done and Dusted Hertfordshire</a></p>
-                        </div>
-                    </div>
-                    <div class="map-container" data-aos="fade-up" data-aos-delay="200">
-                        <iframe
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d158858.47340002653!2d-0.2276542867887623!3d51.8003644507962!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4876360015538063%3A0x64d6339662764b7!2sHertfordshire%2C%20UK!5e0!3m2!1sen!2sus!4v1685123456789!5m2!1sen!2sus"
-                            width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy"
-                            referrerpolicy="no-referrer-when-downgrade"></iframe>
-                    </div>
-                </div>
-            </section>
-            </main>
-
-            <footer class="footer">
-                <div class="container">
-                    <div class="footer-content">
-                        <div class="footer-brand">
-                            <h3>Done & Dusted</h3>
-                            <p>Hertfordshire's Premier Cleaning Service</p>
-                        </div>
-                        <div class="footer-nav">
-                            <h4>Quick Links</h4>
-                            <ul>
-                                <li><a href="#hero">Home</a></li>
-                                <li><a href="#services">Services</a></li>
-                                <li><a href="#gallery">Gallery</a></li>
-                                <li><a href="#booking">Book Now</a></li>
-                                <li><a href="admin/index.html">Admin Login</a></li>
-                            </ul>
-                        </div>
-                        <div class="footer-social">
-                            <h4>Connect</h4>
-                            <div class="social-icons">
-                                <a href="https://instagram.com/doneanddustedhertfordshire_" target="_blank"><i
-                                        class="fab fa-instagram"></i></a>
-                                <a href="#"><i class="fab fa-facebook-f"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="footer-bottom">
-                        <p>&copy; 2025 Done and Dusted Hertfordshire. All rights reserved. | Trusted cleaning services
-                            with
-                            a personal touch.</p>
-                    </div>
-                </div>
-            </footer>
-
-            <!-- Scripts -->
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-            <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-            <script
-                src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox-plus-jquery.min.js"></script>
-            <script src="assets/dusted-assistant.js"></script>
-            </body>
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="js/main.js"></script>
+</body>
 
 </html>
