@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', () => {
     // Register GSAP ScrollTrigger
     gsap.registerPlugin(ScrollTrigger);
@@ -10,29 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
         offset: 50
     });
 
-    // --- Hero Section Animations ---
-    const heroTimeline = gsap.timeline();
-
-    heroTimeline
-        .from('.hero-bg-overlay', {
-            duration: 1.5,
-            opacity: 0,
-            ease: 'power2.inOut'
-        })
-        .from('.gsap-hero-text', {
-            duration: 1,
-            y: 50,
-            opacity: 0,
-            stagger: 0.2,
-            ease: 'power3.out'
-        }, '-=0.5')
-        .from('.gsap-hero-btns', {
-            duration: 0.8,
-            y: 30,
-            opacity: 0,
-            ease: 'back.out(1.7)'
-        }, '-=0.3');
-
     // Hero Parallax Effect
     gsap.to('.hero', {
         backgroundPosition: "50% 100%",
@@ -43,6 +21,21 @@ document.addEventListener('DOMContentLoaded', () => {
             end: "bottom top",
             scrub: true
         }
+    });
+
+    // --- Section Headers Animation ---
+    gsap.utils.toArray('.section-header').forEach(header => {
+        gsap.from(header, {
+            scrollTrigger: {
+                trigger: header,
+                start: "top 80%",
+                toggleActions: "play none none reverse"
+            },
+            y: 30,
+            opacity: 0,
+            duration: 0.8,
+            ease: "power3.out"
+        });
     });
 
     // --- Founder Section Animation ---
