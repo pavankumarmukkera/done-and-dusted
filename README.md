@@ -33,9 +33,9 @@ This repository contains a static website for **Done and Dusted Hertfordshire**,
 
 | Section | Description |
 |---------|-------------|
-| **Hero** | Large headline *“Professional Cleaning for Your Peace of Mind”* with CTA buttons *Get a Quote* and *View Services*.
+| **Hero** | Large headline *“Professional Cleaning for Your Peace of Mind”* with CTA buttons *Get a Quote* and *View Services*. Background features a blurred, high-quality image of a clean living space.
 | **Services** | Six service cards (Domestic, Commercial, Deep Clean, End of Tenancy, Airbnb, HMO) each with an icon, image and short description.
-| **Why Choose Us?** | Feature list: Experienced & Vetted Staff, Eco‑Friendly Products, 100% Satisfaction, Competitive Pricing.
+| **Why Choose Us?** | Modern card-based grid layout highlighting key features: Experienced & Vetted Staff, Eco‑Friendly Products, 100% Satisfaction, Competitive Pricing.
 | **Founder** | Founder profile with photo, quote, and name.
 | **Loyalty Program** | Collect 5 cleans → 10 % off next service; visual stamp progress.
 | **Testimonials** | Three customer testimonials (Sarah, Mike, Emma) with star rating and photos.
@@ -86,7 +86,7 @@ This repository contains a static website for **Done and Dusted Hertfordshire**,
 ├── download_images.ps1   # PowerShell helper script (not used by the site)
 ├── fix_style.py          # Python helper script (not used by the site)
 ├── index.html            # Main page (see above for full markup)
-├── script.js             # Site‑wide JavaScript (animations, AOS init, etc.)
+├── script.js             # Site‑wide JavaScript
 ├── style.css             # Main stylesheet (layout, colors, responsive design)
 └── README.md             # **This file**
 ```
@@ -107,7 +107,6 @@ This repository contains a static website for **Done and Dusted Hertfordshire**,
 ## Usage
 - Navigate using the top navigation bar (Home, Services, About, Loyalty, Contact, Book Now).
 - The **Book Now** button scrolls to the booking form.
-- The site uses **AOS** for scroll animations and **GSAP** for hero text animation.
 - All interactive elements are plain JavaScript – no build step required.
 
 ---
