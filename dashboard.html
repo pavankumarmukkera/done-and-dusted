@@ -5,49 +5,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | Done and Dusted</title>
-    <!DOCTYPE html>
-    <html lang="en">
-
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Admin Dashboard | Done and Dusted</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <!-- AOS Animation -->
-        <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-        <link rel="stylesheet" href="css/admin.css">
-        <link rel="stylesheet" href="css/chat.css">
-    </head>
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
 
 <body>
     <div id="dashboardApp" class="dashboard-app">
+        <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h3>Done & Dusted</h3>
-                <p>Admin Panel</p>
+                <p>Admin Dashboard</p>
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li class="active" data-view="overview"><i class="fas fa-th-large"></i> Dashboard</li>
-                    <li data-view="bookings"><i class="fas fa-calendar-check"></i> Bookings</li>
-                    <li data-view="clients"><i class="fas fa-users"></i> Clients</li>
-                    <li data-view="services"><i class="fas fa-broom"></i> Services</li>
-                    <li data-view="reports"><i class="fas fa-chart-bar"></i> Reports</li>
+                    <li class="active" data-view="overview">
+                        <i class="fas fa-home"></i> Overview
+                    </li>
+                    <li data-view="bookings">
+                        <i class="fas fa-calendar-alt"></i> Bookings
+                    </li>
+                    <li data-view="clients">
+                        <i class="fas fa-users"></i> Clients
+                    </li>
+                    <li data-view="services">
+                        <i class="fas fa-concierge-bell"></i> Services
+                    </li>
+                    <li data-view="reports">
+                        <i class="fas fa-chart-line"></i> Analytics
+                    </li>
                 </ul>
             </nav>
             <div class="sidebar-footer">
-                <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                <button id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </button>
             </div>
         </aside>
 
+        <!-- Main Content -->
         <main class="main-content">
+            <!-- Top Bar -->
             <div class="topbar">
-                <h2 id="pageTitle">Dashboard</h2>
+                <div>
+                    <h2 id="pageTitle">Overview</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">
+                        Welcome back! Here's what's happening today.
+                    </p>
+                </div>
                 <div class="topbar-actions">
-                    <button id="btnNewBooking" class="btn btn-primary"><i class="fas fa-plus"></i> New Booking</button>
+                    <button id="btnRefresh" class="btn btn-secondary" onclick="loadDashboardData()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                    <button id="btnNewBooking" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> New Booking
+                    </button>
                 </div>
             </div>
 
@@ -55,22 +72,28 @@
             <div id="overviewView" class="view-section">
                 <!-- Stats Cards -->
                 <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon icon-blue"><i class="fas fa-calendar-check"></i></div>
+                    <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+                        <div class="stat-icon icon-blue">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
                         <div class="stat-info">
                             <h3>Total Bookings</h3>
                             <p id="totalBookings">0</p>
                         </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon icon-green"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                        <div class="stat-icon icon-green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
                         <div class="stat-info">
                             <h3>Completed</h3>
                             <p id="completedBookings">0</p>
                         </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon icon-yellow"><i class="fas fa-clock"></i></div>
+                    <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+                        <div class="stat-icon icon-yellow">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
                         <div class="stat-info">
                             <h3>Pending</h3>
                             <p id="pendingBookings">0</p>
@@ -78,13 +101,17 @@
                     </div>
                 </div>
 
+                <!-- Dashboard Grid -->
                 <div class="dashboard-grid">
                     <!-- Recent Bookings -->
-                    <div class="card recent-bookings-card">
+                    <div class="card" data-aos="fade-up" data-aos-delay="400">
                         <div class="card-header">
-                            <h3>Recent Bookings</h3>
-                            <a href="#" onclick="document.querySelector('[data-view=\'bookings\']').click()">View
-                                All</a>
+                            <h3><i class="fas fa-clock" style="margin-right: 8px; color: var(--accent);"></i>Recent
+                                Bookings</h3>
+                            <a href="#"
+                                onclick="document.querySelector('[data-view=\'bookings\']').click(); return false;">
+                                View All <i class="fas fa-arrow-right" style="margin-left: 4px;"></i>
+                            </a>
                         </div>
                         <div class="table-responsive">
                             <table class="table">
@@ -97,16 +124,19 @@
                                     </tr>
                                 </thead>
                                 <tbody id="recentBookingsTable">
-                                    <!-- Populated by JS -->
+                                    <tr>
+                                        <td colspan="4" class="loading">Loading bookings</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
                     <!-- Mini Calendar -->
-                    <div class="card calendar-card">
+                    <div class="card" data-aos="fade-up" data-aos-delay="500">
                         <div class="card-header">
-                            <h3>Schedule</h3>
+                            <h3><i class="fas fa-calendar" style="margin-right: 8px; color: var(--accent);"></i>This
+                                Month</h3>
                         </div>
                         <div id="miniCalendar" class="mini-calendar">
                             <!-- Populated by JS -->
@@ -119,7 +149,8 @@
             <div id="bookingsView" class="view-section hidden">
                 <div class="card">
                     <div class="card-header">
-                        <h3>All Bookings</h3>
+                        <h3><i class="fas fa-list" style="margin-right: 8px; color: var(--accent);"></i>All Bookings
+                        </h3>
                         <div class="search-box">
                             <i class="fas fa-search"></i>
                             <input type="text" id="searchBookings" placeholder="Search bookings...">
@@ -137,7 +168,9 @@
                                 </tr>
                             </thead>
                             <tbody id="allBookingsTable">
-                                <!-- Populated by JS -->
+                                <tr>
+                                    <td colspan="5" class="loading">Loading bookings</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -148,9 +181,12 @@
             <div id="clientsView" class="view-section hidden">
                 <div class="card">
                     <div class="card-header">
-                        <h3>Clients Management</h3>
+                        <h3><i class="fas fa-user-friends" style="margin-right: 8px; color: var(--accent);"></i>Client
+                            Management</h3>
                     </div>
-                    <!-- Populated by JS -->
+                    <div id="clientsTableContainer">
+                        <div class="loading">Loading clients</div>
+                    </div>
                 </div>
             </div>
 
@@ -158,10 +194,54 @@
             <div id="servicesView" class="view-section hidden">
                 <div class="card">
                     <div class="card-header">
-                        <h3>Services Management</h3>
+                        <h3><i class="fas fa-broom" style="margin-right: 8px; color: var(--accent);"></i>Our Services
+                        </h3>
                     </div>
-                    <div style="padding: 20px;">
-                        <p>Service management features coming soon...</p>
+                    <div style="padding: 32px;">
+                        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                            <div class="stat-card">
+                                <div class="stat-icon icon-blue"><i class="fas fa-home"></i></div>
+                                <div class="stat-info">
+                                    <h3>Domestic</h3>
+                                    <p style="font-size: 1rem;">Regular home cleaning</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon icon-green"><i class="fas fa-building"></i></div>
+                                <div class="stat-info">
+                                    <h3>Commercial</h3>
+                                    <p style="font-size: 1rem;">Office & workspace</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon icon-yellow"><i class="fas fa-sparkles"></i></div>
+                                <div class="stat-info">
+                                    <h3>Deep Clean</h3>
+                                    <p style="font-size: 1rem;">Intensive cleaning</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon icon-blue"><i class="fas fa-key"></i></div>
+                                <div class="stat-info">
+                                    <h3>End of Tenancy</h3>
+                                    <p style="font-size: 1rem;">Move-out cleaning</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon icon-green"><i class="fas fa-plane"></i></div>
+                                <div class="stat-info">
+                                    <h3>AirBnB</h3>
+                                    <p style="font-size: 1rem;">Turnover service</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon icon-yellow"><i class="fas fa-users"></i></div>
+                                <div class="stat-info">
+                                    <h3>HMO</h3>
+                                    <p style="font-size: 1rem;">Communal areas</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -170,10 +250,11 @@
             <div id="reportsView" class="view-section hidden">
                 <div class="card">
                     <div class="card-header">
-                        <h3>Reports & Analytics</h3>
+                        <h3><i class="fas fa-chart-bar" style="margin-right: 8px; color: var(--accent);"></i>Booking
+                            Analytics</h3>
                     </div>
-                    <div style="padding: 20px;">
-                        <canvas id="reportsChart"></canvas>
+                    <div style="padding: 32px;">
+                        <canvas id="reportsChart" height="300"></canvas>
                     </div>
                 </div>
             </div>
@@ -185,38 +266,51 @@
         <div class="modal-content">
             <span class="close-modal" id="closeModalBtn">&times;</span>
             <div class="modal-header">
-                <h2>Booking Details</h2>
+                <h2>📋 Booking Details</h2>
                 <span id="modalStatus" class="status-badge"></span>
             </div>
             <div class="modal-body">
                 <div class="detail-group">
-                    <label>Customer Name</label>
+                    <label><i class="fas fa-user"></i> Customer Name</label>
                     <p id="modalName"></p>
                 </div>
                 <div class="detail-group">
-                    <label>Email</label>
+                    <label><i class="fas fa-envelope"></i> Email</label>
                     <p id="modalEmail"></p>
                 </div>
                 <div class="detail-group">
-                    <label>Phone</label>
+                    <label><i class="fas fa-phone"></i> Phone</label>
                     <p id="modalPhone"></p>
                 </div>
                 <div class="detail-group">
-                    <label>Service</label>
+                    <label><i class="fas fa-broom"></i> Service</label>
                     <p id="modalService"></p>
                 </div>
                 <div class="detail-group">
-                    <label>Date</label>
+                    <label><i class="fas fa-calendar"></i> Date</label>
                     <p id="modalDate"></p>
                 </div>
                 <div class="detail-group">
-                    <label>Notes</label>
+                    <label><i class="fas fa-sticky-note"></i> Notes</label>
                     <p id="modalNotes"></p>
+                </div>
+                <div class="detail-group">
+                    <label><i class="fas fa-flag"></i> Update Status</label>
+                    <select id="modalStatusSelect">
+                        <option value="Pending">🟡 Pending</option>
+                        <option value="Confirmed">🔵 Confirmed</option>
+                        <option value="Completed">🟢 Completed</option>
+                        <option value="Cancelled">🔴 Cancelled</option>
+                    </select>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-danger" id="deleteBookingBtn"><i class="fas fa-trash"></i> Delete
-                    Booking</button>
+                <button class="btn btn-primary" id="updateStatusBtn">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <button class="btn btn-danger" id="deleteBookingBtn">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
             </div>
         </div>
     </div>
@@ -226,51 +320,56 @@
         <div class="modal-content">
             <span class="close-modal" onclick="closeNewBookingModal()">&times;</span>
             <div class="modal-header">
-                <h2>New Booking</h2>
+                <h2>➕ Create New Booking</h2>
             </div>
             <div class="modal-body">
                 <form id="newBookingForm">
                     <div class="form-group">
                         <label>Customer Name</label>
-                        <input type="text" id="newBookingName" required>
+                        <input type="text" id="newBookingName" placeholder="Enter full name" required>
                     </div>
                     <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="newBookingEmail" required>
+                        <label>Email Address</label>
+                        <input type="email" id="newBookingEmail" placeholder="customer@email.com" required>
                     </div>
                     <div class="form-group">
-                        <label>Phone</label>
-                        <input type="tel" id="newBookingPhone" required>
+                        <label>Phone Number</label>
+                        <input type="tel" id="newBookingPhone" placeholder="07xxx xxxxxx" required>
                     </div>
                     <div class="form-group">
                         <label>Service Type</label>
                         <select id="newBookingService" required>
-                            <option value="Domestic Cleaning">Domestic Cleaning</option>
-                            <option value="Deep Clean">Deep Clean</option>
-                            <option value="End of Tenancy">End of Tenancy</option>
-                            <option value="Commercial Cleaning">Commercial Cleaning</option>
-                            <option value="AirBnB Cleaning">AirBnB Cleaning</option>
+                            <option value="Domestic Cleaning">🏠 Domestic Cleaning</option>
+                            <option value="Commercial Cleaning">🏢 Commercial Cleaning</option>
+                            <option value="Deep Clean">✨ Deep Clean</option>
+                            <option value="End of Tenancy">🔑 End of Tenancy</option>
+                            <option value="AirBnB Cleaning">✈️ AirBnB Cleaning</option>
+                            <option value="HMO Cleaning">👥 HMO Cleaning</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Date</label>
+                        <label>Preferred Date</label>
                         <input type="date" id="newBookingDate" required>
                     </div>
                     <div class="form-group">
-                        <label>Notes</label>
-                        <textarea id="newBookingNotes" rows="3"></textarea>
+                        <label>Additional Notes</label>
+                        <textarea id="newBookingNotes" rows="3"
+                            placeholder="Any special requests or details..."></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Create
-                        Booking</button>
+                    <button type="submit" class="btn btn-primary btn-block" style="margin-top: 16px;">
+                        <i class="fas fa-check"></i> Create Booking
+                    </button>
                 </form>
             </div>
         </div>
     </div>
 
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="js/admin.js"></script>
-    <script src="js/chat.js"></script>
 </body>
 
 </html>

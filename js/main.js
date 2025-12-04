@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Enhanced Booking Form Handling ---
     const bookingForm = document.getElementById('bookingForm');
     if (bookingForm) {
-        bookingForm.addEventListener('submit', (e) => {
+        bookingForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = bookingForm.querySelector('button');
             const originalText = btn.innerText;
@@ -137,47 +137,46 @@ document.addEventListener('DOMContentLoaded', () => {
             // Collect form data
             const formData = new FormData(bookingForm);
             const booking = {
-                id: Date.now(),
                 name: formData.get('name'),
                 email: formData.get('email'),
                 phone: formData.get('phone'),
                 service: formData.get('service'),
                 date: formData.get('date'),
-                message: formData.get('message'),
-                status: 'Pending',
-                timestamp: new Date().toISOString()
+                notes: formData.get('message') || '',
+                status: 'Pending'
             };
 
-            // Save to LocalStorage (Simulating Database)
+            // Save to Supabase Database
             try {
-                const bookings = JSON.parse(localStorage.getItem('dd_bookings') || '[]');
-                bookings.push(booking);
-                localStorage.setItem('dd_bookings', JSON.stringify(bookings));
+                const { error } = await supabase
+                    .from('bookings')
+                    .insert([booking]);
 
-                // Simulate Network Delay
+                if (error) throw error;
+
+                // Success State
+                btn.innerHTML = '<i class="fas fa-check"></i> Request Sent!';
+                btn.style.backgroundColor = '#10b981'; // Green color
+                btn.style.opacity = '1';
+
+                // Show Toast Notification
+                showToast('Booking request received! We will contact you shortly.', 'success');
+
+                bookingForm.reset();
+
+                // Reset button after delay
                 setTimeout(() => {
-                    // Success State
-                    btn.innerHTML = '<i class="fas fa-check"></i> Request Sent!';
-                    btn.style.backgroundColor = '#10b981'; // Green color
-                    btn.style.opacity = '1';
+                    btn.innerText = originalText;
+                    btn.style.backgroundColor = '';
+                    btn.disabled = false;
+                }, 3000);
 
-                    // Show Toast Notification
-                    showToast('Booking request received! We will contact you shortly.', 'success');
-
-                    bookingForm.reset();
-
-                    // Reset button after delay
-                    setTimeout(() => {
-                        btn.innerText = originalText;
-                        btn.style.backgroundColor = '';
-                        btn.disabled = false;
-                    }, 3000);
-
-                }, 1500);
             } catch (error) {
                 console.error('Booking Error:', error);
-                btn.innerText = 'Error. Try Again.';
+                btn.innerHTML = '<i class="fas fa-times"></i> Error. Try Again.';
                 btn.style.backgroundColor = '#ef4444'; // Red color
+
+                showToast('Failed to submit booking. Please try again.', 'error');
 
                 setTimeout(() => {
                     btn.innerText = originalText;
@@ -192,11 +191,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function showToast(message, type = 'info') {
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
+
+        const bgColor = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6';
+        const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+
         toast.style.cssText = `
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: ${type === 'success' ? '#10b981' : '#3b82f6'};
+            background: ${bgColor};
             color: white;
             padding: 1rem 1.5rem;
             border-radius: 8px;
@@ -207,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
             opacity: 0;
             transition: all 0.3s ease;
         `;
-        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i> ${message}`;
+        toast.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
 
         document.body.appendChild(toast);
 

@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Initialize Data
+        // Initialize Data from Supabase
         loadDashboardData();
         initCalendar();
         initCharts();
@@ -86,38 +86,66 @@ document.addEventListener('DOMContentLoaded', () => {
                 offset: 50
             });
         }
+
+        // Initialize Search
+        const searchInput = document.getElementById('searchBookings');
+        if (searchInput) {
+            searchInput.addEventListener('input', async (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                await searchBookings(searchTerm);
+            });
+        }
     }
 });
 
-// --- Data Functions ---
-function loadDashboardData() {
-    let bookings = JSON.parse(localStorage.getItem('dd_bookings') || '[]');
+// --- Data Functions (Supabase) ---
+async function loadDashboardData() {
+    try {
+        const { data: bookings, error } = await supabase
+            .from('bookings')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-    // Dummy Data if empty
-    if (bookings.length === 0) {
-        bookings = [
-            { id: 1, name: 'Alice Johnson', email: 'alice@example.com', phone: '07712345678', service: 'Domestic Cleaning', date: '2025-11-28', status: 'Pending', notes: 'Key under mat.' },
-            { id: 2, name: 'Bob Smith', email: 'bob@example.com', phone: '07787654321', service: 'Deep Clean', date: '2025-11-25', status: 'Completed', notes: 'Focus on kitchen.' },
-            { id: 3, name: 'Charlie Brown', email: 'charlie@example.com', phone: '07711223344', service: 'End of Tenancy', date: '2025-12-01', status: 'Pending', notes: 'Landlord inspection next day.' },
-            { id: 4, name: 'David Wilson', email: 'david@example.com', phone: '07755667788', service: 'Commercial Cleaning', date: '2025-11-20', status: 'Completed', notes: 'Office block A.' },
-            { id: 5, name: 'Eva Green', email: 'eva@example.com', phone: '07799887766', service: 'AirBnB Cleaning', date: '2025-11-29', status: 'Pending', notes: 'Guest arriving at 3pm.' }
-        ];
-        localStorage.setItem('dd_bookings', JSON.stringify(bookings));
+        if (error) throw error;
+
+        // Update Stats
+        const totalEl = document.getElementById('totalBookings');
+        const completedEl = document.getElementById('completedBookings');
+        const pendingEl = document.getElementById('pendingBookings');
+
+        if (totalEl) totalEl.innerText = bookings.length;
+        if (completedEl) completedEl.innerText = bookings.filter(b => b.status === 'Completed').length;
+        if (pendingEl) pendingEl.innerText = bookings.filter(b => b.status === 'Pending').length;
+
+        // Render Tables
+        renderBookingsTable(bookings);
+        renderRecentBookings(bookings);
+        renderClientsTable(bookings);
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        showToast('Failed to load bookings data', 'error');
     }
+}
 
-    // Update Stats
-    const totalEl = document.getElementById('totalBookings');
-    const completedEl = document.getElementById('completedBookings');
-    const pendingEl = document.getElementById('pendingBookings');
+async function searchBookings(searchTerm) {
+    try {
+        const { data: bookings, error } = await supabase
+            .from('bookings')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-    if (totalEl) totalEl.innerText = bookings.length;
-    if (completedEl) completedEl.innerText = bookings.filter(b => b.status === 'Completed').length;
-    if (pendingEl) pendingEl.innerText = bookings.filter(b => b.status === 'Pending').length;
+        if (error) throw error;
 
-    // Render Tables
-    renderBookingsTable(bookings);
-    renderRecentBookings(bookings);
-    renderClientsTable(bookings);
+        const filtered = bookings.filter(b =>
+            b.name.toLowerCase().includes(searchTerm) ||
+            b.email.toLowerCase().includes(searchTerm) ||
+            b.service.toLowerCase().includes(searchTerm) ||
+            b.date.includes(searchTerm)
+        );
+        renderBookingsTable(filtered);
+    } catch (error) {
+        console.error('Error searching bookings:', error);
+    }
 }
 
 function renderRecentBookings(bookings) {
@@ -125,15 +153,20 @@ function renderRecentBookings(bookings) {
     if (!tbody) return;
     tbody.innerHTML = '';
 
-    // Sort by date (newest first) and take top 5
-    const recent = [...bookings].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+    if (bookings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #666;">No bookings yet</td></tr>';
+        return;
+    }
+
+    // Take top 5 (already sorted by created_at desc)
+    const recent = bookings.slice(0, 5);
 
     recent.forEach(booking => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${booking.name}</td>
             <td>${booking.service}</td>
-            <td>${booking.date}</td>
+            <td>${formatDate(booking.date)}</td>
             <td><span class="status-badge status-${booking.status.toLowerCase()}">${booking.status}</span></td>
         `;
         tbody.appendChild(tr);
@@ -145,12 +178,17 @@ function renderBookingsTable(bookings) {
     if (!tbody) return;
     tbody.innerHTML = '';
 
+    if (bookings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #666;">No bookings found</td></tr>';
+        return;
+    }
+
     bookings.forEach(booking => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${booking.name}</td>
             <td>${booking.service}</td>
-            <td>${booking.date}</td>
+            <td>${formatDate(booking.date)}</td>
             <td><span class="status-badge status-${booking.status.toLowerCase()}">${booking.status}</span></td>
             <td>
                 <button class="btn btn-sm btn-view" onclick="openBookingModal(${booking.id})"><i class="fas fa-eye"></i> View</button>
@@ -162,8 +200,13 @@ function renderBookingsTable(bookings) {
 }
 
 function renderClientsTable(bookings) {
-    const clientsView = document.getElementById('clientsView');
-    if (!clientsView) return;
+    const container = document.getElementById('clientsTableContainer');
+    if (!container) return;
+
+    if (bookings.length === 0) {
+        container.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">No clients yet</div>';
+        return;
+    }
 
     // Simple deduplication for clients
     const clients = {};
@@ -193,42 +236,56 @@ function renderClientsTable(bookings) {
                 <td>${client.name}</td>
                 <td>${client.email}</td>
                 <td>${client.phone}</td>
-                <td>${client.lastBooking}</td>
+                <td>${formatDate(client.lastBooking)}</td>
             </tr>
         `;
     });
 
     html += `</tbody></table></div>`;
-    clientsView.innerHTML = html;
+    container.innerHTML = html;
 }
 
 // --- Modal Logic ---
-// --- Modal Logic ---
-window.openBookingModal = function (id) {
-    const bookings = JSON.parse(localStorage.getItem('dd_bookings') || '[]');
-    const booking = bookings.find(b => b.id === id);
-    if (!booking) return;
+let currentBookingId = null;
 
-    document.getElementById('modalName').innerText = booking.name;
-    document.getElementById('modalEmail').innerText = booking.email;
-    document.getElementById('modalPhone').innerText = booking.phone;
-    document.getElementById('modalService').innerText = booking.service;
-    document.getElementById('modalDate').innerText = booking.date;
-    document.getElementById('modalNotes').innerText = booking.notes || 'No notes.';
+window.openBookingModal = async function (id) {
+    try {
+        const { data: booking, error } = await supabase
+            .from('bookings')
+            .select('*')
+            .eq('id', id)
+            .single();
 
-    const statusBadge = document.getElementById('modalStatus');
-    statusBadge.innerText = booking.status;
-    statusBadge.className = `status-badge status-${booking.status.toLowerCase()}`;
+        if (error) throw error;
+        if (!booking) return;
 
-    const modal = document.getElementById('bookingModal');
-    modal.classList.remove('hidden');
-    setTimeout(() => modal.classList.add('active'), 10); // Fade in
+        currentBookingId = id;
 
-    // Delete Button in Modal
-    document.getElementById('deleteBookingBtn').onclick = () => {
-        deleteBooking(id);
-        closeModal();
-    };
+        document.getElementById('modalName').innerText = booking.name;
+        document.getElementById('modalEmail').innerText = booking.email;
+        document.getElementById('modalPhone').innerText = booking.phone;
+        document.getElementById('modalService').innerText = booking.service;
+        document.getElementById('modalDate').innerText = formatDate(booking.date);
+        document.getElementById('modalNotes').innerText = booking.notes || 'No notes.';
+
+        const statusBadge = document.getElementById('modalStatus');
+        statusBadge.innerText = booking.status;
+        statusBadge.className = `status-badge status-${booking.status.toLowerCase()}`;
+
+        // Set up status selector
+        const statusSelect = document.getElementById('modalStatusSelect');
+        if (statusSelect) {
+            statusSelect.value = booking.status;
+        }
+
+        const modal = document.getElementById('bookingModal');
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.add('active'), 10); // Fade in
+
+    } catch (error) {
+        console.error('Error loading booking:', error);
+        showToast('Failed to load booking details', 'error');
+    }
 };
 
 function closeModal() {
@@ -237,6 +294,7 @@ function closeModal() {
         modal.classList.remove('active');
         setTimeout(() => modal.classList.add('hidden'), 300);
     }
+    currentBookingId = null;
 }
 
 // New Booking Modal Logic
@@ -258,27 +316,67 @@ window.closeNewBookingModal = function () {
 };
 
 document.getElementById('closeModalBtn')?.addEventListener('click', closeModal);
-document.querySelector('.close-modal')?.addEventListener('click', closeModal);
 
-window.deleteBooking = function (id) {
+// Update Status Button
+document.getElementById('updateStatusBtn')?.addEventListener('click', async () => {
+    if (!currentBookingId) return;
+    const statusSelect = document.getElementById('modalStatusSelect');
+    if (statusSelect) {
+        await updateBookingStatus(currentBookingId, statusSelect.value);
+    }
+});
+
+// Delete Button in Modal
+document.getElementById('deleteBookingBtn')?.addEventListener('click', async () => {
+    if (currentBookingId) {
+        await deleteBooking(currentBookingId);
+        closeModal();
+    }
+});
+
+window.deleteBooking = async function (id) {
     if (confirm('Are you sure you want to delete this booking?')) {
-        let bookings = JSON.parse(localStorage.getItem('dd_bookings') || '[]');
-        bookings = bookings.filter(b => b.id !== id);
-        localStorage.setItem('dd_bookings', JSON.stringify(bookings));
-        loadDashboardData(); // Refresh UI
+        try {
+            const { error } = await supabase
+                .from('bookings')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            showToast('Booking deleted successfully', 'success');
+            await loadDashboardData(); // Refresh UI
+        } catch (error) {
+            console.error('Error deleting booking:', error);
+            showToast('Failed to delete booking', 'error');
+        }
+    }
+};
+
+window.updateBookingStatus = async function (id, newStatus) {
+    try {
+        const { error } = await supabase
+            .from('bookings')
+            .update({ status: newStatus, updated_at: new Date().toISOString() })
+            .eq('id', id);
+
+        if (error) throw error;
+
+        showToast(`Status updated to ${newStatus}`, 'success');
+        await loadDashboardData(); // Refresh UI
+        closeModal();
+    } catch (error) {
+        console.error('Error updating status:', error);
+        showToast('Failed to update status', 'error');
     }
 };
 
 const newBookingForm = document.getElementById('newBookingForm');
 if (newBookingForm) {
-    newBookingForm.addEventListener('submit', (e) => {
+    newBookingForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const bookings = JSON.parse(localStorage.getItem('dd_bookings') || '[]');
-        const newId = bookings.length > 0 ? Math.max(...bookings.map(b => b.id)) + 1 : 1;
-
         const newBooking = {
-            id: newId,
             name: document.getElementById('newBookingName').value,
             email: document.getElementById('newBookingEmail').value,
             phone: document.getElementById('newBookingPhone').value,
@@ -288,22 +386,47 @@ if (newBookingForm) {
             notes: document.getElementById('newBookingNotes').value
         };
 
-        bookings.push(newBooking);
-        localStorage.setItem('dd_bookings', JSON.stringify(bookings));
+        try {
+            const { error } = await supabase
+                .from('bookings')
+                .insert([newBooking]);
 
-        loadDashboardData();
-        closeNewBookingModal();
-        newBookingForm.reset();
-        alert('Booking created successfully!');
+            if (error) throw error;
+
+            showToast('Booking created successfully!', 'success');
+            await loadDashboardData();
+            closeNewBookingModal();
+            newBookingForm.reset();
+        } catch (error) {
+            console.error('Error creating booking:', error);
+            showToast('Failed to create booking', 'error');
+        }
     });
 }
 
-// --- Calendar Logic (Simple Mock) ---
-function initCalendar() {
+// --- Calendar Logic ---
+async function initCalendar() {
     const grid = document.getElementById('miniCalendar');
     if (!grid) return;
 
     grid.innerHTML = ''; // Clear existing
+
+    // Get bookings for calendar
+    let bookedDays = [];
+    try {
+        const { data: bookings, error } = await supabase
+            .from('bookings')
+            .select('date')
+            .gte('date', new Date().toISOString().split('T')[0]);
+
+        if (!error && bookings) {
+            bookedDays = bookings.map(b => new Date(b.date).getDate());
+        }
+    } catch (e) {
+        console.error('Error loading calendar data:', e);
+    }
+
+    const today = new Date().getDate();
 
     // Simple 30-day grid
     for (let i = 1; i <= 30; i++) {
@@ -311,11 +434,11 @@ function initCalendar() {
         day.className = 'calendar-day';
         day.innerText = i;
 
-        // Random events
-        if ([5, 12, 18, 25, 28].includes(i)) {
+        // Mark days with bookings
+        if (bookedDays.includes(i)) {
             day.classList.add('has-event');
         }
-        if (i === 27) { // Today
+        if (i === today) {
             day.classList.add('today');
         }
 
@@ -324,13 +447,32 @@ function initCalendar() {
 }
 
 // --- Charts Logic ---
-function initCharts() {
+async function initCharts() {
     const ctx = document.getElementById('reportsChart');
     if (!ctx) return;
 
-    // Destroy existing chart if any (to prevent overlap on re-init)
+    // Destroy existing chart if any
     if (window.myChart) {
         window.myChart.destroy();
+    }
+
+    // Get booking stats by month
+    let monthlyData = [0, 0, 0, 0, 0, 0];
+    try {
+        const { data: bookings, error } = await supabase
+            .from('bookings')
+            .select('date, status');
+
+        if (!error && bookings) {
+            bookings.forEach(b => {
+                const month = new Date(b.date).getMonth();
+                if (month >= 0 && month < 6) {
+                    monthlyData[month]++;
+                }
+            });
+        }
+    } catch (e) {
+        console.error('Error loading chart data:', e);
     }
 
     window.myChart = new Chart(ctx, {
@@ -338,8 +480,8 @@ function initCharts() {
         data: {
             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
             datasets: [{
-                label: 'Monthly Revenue (£)',
-                data: [1200, 1900, 3000, 5000, 4500, 6000],
+                label: 'Bookings per Month',
+                data: monthlyData,
                 backgroundColor: '#3b82f6',
                 borderColor: '#0f172a',
                 borderWidth: 1
@@ -349,9 +491,59 @@ function initCharts() {
             responsive: true,
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
                 }
             }
         }
     });
+}
+
+// --- Helper Functions ---
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    const bgColor = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6';
+    const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${bgColor};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 9999;
+        font-weight: 600;
+        transform: translateX(100px);
+        opacity: 0;
+        transition: all 0.3s ease;
+    `;
+    toast.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+
+    document.body.appendChild(toast);
+
+    // Animate in
+    requestAnimationFrame(() => {
+        toast.style.transform = 'translateX(0)';
+        toast.style.opacity = '1';
+    });
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+        toast.style.transform = 'translateX(100px)';
+        toast.style.opacity = '0';
+        setTimeout(() => {
+            document.body.removeChild(toast);
+        }, 300);
+    }, 3000);
 }
