@@ -2,26 +2,28 @@
    Modern Cleaning Service Theme - CSS Variables
    ======================================== */
 :root {
-  /* Primary Deep Blue */
-  --primary-blue: #0A4A6E;
-  --primary-blue-dark: #083854;
-  --primary-blue-gradient-end: #0F6F93;
+  /* Brand Colors */
+  --primary-blue: #005E8C;
+  --light-blue-accent: #77BFDB;
+  --highlight-yellow: #FFD700;
 
-  /* Light Blue Accents */
-  --light-blue: #E6F4FA;
-  --light-blue-dark: #CDE7F4;
+  /* Gradients */
+  --gradient-start: #008FC7;
+  --gradient-end: #005E8C;
 
   /* Neutrals */
   --white: #FFFFFF;
-  --bg-light: #F7F9FB;
+  --bg-page: #F7FAFC;
+  --soft-grey: #E0E6EB;
+  --text-dark: #1D1D1F;
   --text-gray: #6B6B6B;
-  --text-dark: #2E2E2E;
 
-  /* Shadows with blue tint */
-  --shadow-sm: 0 2px 8px rgba(10, 74, 110, 0.08);
-  --shadow-md: 0 4px 16px rgba(10, 74, 110, 0.12);
-  --shadow-lg: 0 8px 32px rgba(10, 74, 110, 0.16);
-  --shadow-hover: 0 12px 40px rgba(10, 74, 110, 0.2);
+  /* Shadows */
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 2px 8px var(--shadow-color);
+  --shadow-md: 0 4px 16px var(--shadow-color);
+  --shadow-lg: 0 8px 32px var(--shadow-color);
+  --shadow-hover: 0 12px 40px var(--shadow-color);
 
   /* Border Radius */
   --border-radius: 16px;
@@ -50,7 +52,7 @@ body {
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   color: var(--text-dark);
   line-height: 1.7;
-  background-color: var(--white);
+  background-color: var(--bg-page);
   overflow-x: hidden;
 }
 
@@ -105,7 +107,7 @@ img {
 }
 
 .bg-light {
-  background-color: var(--bg-light);
+  background-color: var(--soft-grey);
 }
 
 .text-center {
@@ -131,14 +133,14 @@ img {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-gradient-end) 100%);
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
   color: var(--white);
 }
 
 .btn-primary:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-hover);
-  background: linear-gradient(135deg, var(--primary-blue-dark) 0%, var(--primary-blue) 100%);
+  background: linear-gradient(135deg, var(--gradient-end) 0%, var(--gradient-start) 100%);
 }
 
 .btn-secondary {
@@ -156,7 +158,7 @@ img {
 
 .btn-submit {
   width: 100%;
-  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-gradient-end) 100%);
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
   color: var(--white);
   padding: 18px;
   font-size: 1.1rem;
@@ -204,7 +206,7 @@ img {
 
 .logo-sub {
   font-size: 0.75rem;
-  color: var(--light-blue-dark);
+  color: var(--light-blue-accent);
   letter-spacing: 1.5px;
   text-transform: uppercase;
   font-weight: 600;
@@ -346,14 +348,14 @@ img {
 .service-card:hover {
   transform: translateY(-8px);
   box-shadow: var(--shadow-hover);
-  border-color: var(--light-blue);
+  border-color: var(--light-blue-accent);
 }
 
 .icon-box {
   width: 80px;
   height: 80px;
   margin: 0 auto 24px;
-  background: var(--light-blue);
+  background: var(--soft-grey);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -362,7 +364,7 @@ img {
 }
 
 .service-card:hover .icon-box {
-  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-gradient-end) 100%);
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
 }
 
 .icon-box i {
@@ -417,7 +419,7 @@ img {
 
 .quote-icon {
   font-size: 3rem;
-  color: var(--light-blue);
+  color: var(--light-blue-accent);
   margin-bottom: 20px;
 }
 
@@ -445,7 +447,7 @@ img {
    Loyalty Program
    ======================================== */
 .loyalty-card {
-  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-gradient-end) 100%);
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
   padding: 60px 40px;
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-lg);
@@ -508,7 +510,7 @@ img {
 }
 
 .loyalty-card .btn:hover {
-  background: var(--bg-light);
+  background: var(--soft-grey);
   transform: translateY(-4px);
 }
 
@@ -536,7 +538,7 @@ img {
 }
 
 .stars {
-  color: #ffc107;
+  color: var(--highlight-yellow);
   font-size: 1.5rem;
   margin-bottom: 20px;
 }
@@ -560,7 +562,7 @@ img {
   height: 56px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid var(--light-blue);
+  border: 3px solid var(--light-blue-accent);
 }
 
 .client-info h4 {
@@ -623,12 +625,12 @@ img {
 .form-group select,
 .form-group textarea {
   padding: 14px 18px;
-  border: 2px solid var(--light-blue);
+  border: 2px solid var(--soft-grey);
   border-radius: var(--border-radius-sm);
   font-family: 'Open Sans', sans-serif;
   font-size: 1rem;
   transition: var(--transition);
-  background: var(--bg-light);
+  background: var(--bg-page);
 }
 
 .form-group input:focus,
@@ -668,7 +670,7 @@ img {
 .contact-card:hover {
   transform: translateY(-6px);
   box-shadow: var(--shadow-hover);
-  border-top-color: var(--primary-blue-gradient-end);
+  border-top-color: var(--gradient-start);
 }
 
 .contact-card i {
@@ -681,7 +683,7 @@ img {
 
 .contact-card:hover i {
   transform: scale(1.1);
-  color: var(--primary-blue-gradient-end);
+  color: var(--gradient-start);
 }
 
 .contact-card h3 {
@@ -701,7 +703,7 @@ img {
 }
 
 .contact-card a:hover {
-  color: var(--primary-blue-gradient-end);
+  color: var(--gradient-start);
   text-decoration: underline;
 }
 
@@ -759,7 +761,7 @@ img {
 }
 
 .footer-nav a:hover {
-  color: var(--light-blue);
+  color: var(--light-blue-accent);
   padding-left: 5px;
 }
 
@@ -780,7 +782,7 @@ img {
 }
 
 .social-icons a:hover {
-  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-gradient-end) 100%);
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
   transform: translateY(-4px);
 }
 
