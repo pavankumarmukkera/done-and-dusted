@@ -15,12 +15,13 @@
 </head>
 
 <body>
-    <div id="dashboardApp" class="dashboard-app">
-        <!-- Sidebar -->
+    <div class="dashboard-app">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h3>Done & Dusted</h3>
-                <p>Admin Dashboard</p>
+                <div class="logo">
+                    <span class="logo-text">Done & Dusted</span>
+                    <span class="logo-sub">Admin Dashboard</span>
+                </div>
             </div>
             <nav class="sidebar-nav">
                 <ul>
@@ -32,12 +33,6 @@
                     </li>
                     <li data-view="clients">
                         <i class="fas fa-users"></i> Clients
-                    </li>
-                    <li data-view="services">
-                        <i class="fas fa-concierge-bell"></i> Services
-                    </li>
-                    <li data-view="reports">
-                        <i class="fas fa-chart-line"></i> Analytics
                     </li>
                 </ul>
             </nav>
@@ -189,75 +184,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Services View -->
-            <div id="servicesView" class="view-section hidden">
-                <div class="card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-broom" style="margin-right: 8px; color: var(--accent);"></i>Our Services
-                        </h3>
-                    </div>
-                    <div style="padding: 32px;">
-                        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
-                            <div class="stat-card">
-                                <div class="stat-icon icon-blue"><i class="fas fa-home"></i></div>
-                                <div class="stat-info">
-                                    <h3>Domestic</h3>
-                                    <p style="font-size: 1rem;">Regular home cleaning</p>
-                                </div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon icon-green"><i class="fas fa-building"></i></div>
-                                <div class="stat-info">
-                                    <h3>Commercial</h3>
-                                    <p style="font-size: 1rem;">Office & workspace</p>
-                                </div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon icon-yellow"><i class="fas fa-sparkles"></i></div>
-                                <div class="stat-info">
-                                    <h3>Deep Clean</h3>
-                                    <p style="font-size: 1rem;">Intensive cleaning</p>
-                                </div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon icon-blue"><i class="fas fa-key"></i></div>
-                                <div class="stat-info">
-                                    <h3>End of Tenancy</h3>
-                                    <p style="font-size: 1rem;">Move-out cleaning</p>
-                                </div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon icon-green"><i class="fas fa-plane"></i></div>
-                                <div class="stat-info">
-                                    <h3>AirBnB</h3>
-                                    <p style="font-size: 1rem;">Turnover service</p>
-                                </div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon icon-yellow"><i class="fas fa-users"></i></div>
-                                <div class="stat-info">
-                                    <h3>HMO</h3>
-                                    <p style="font-size: 1rem;">Communal areas</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Reports View -->
-            <div id="reportsView" class="view-section hidden">
-                <div class="card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-chart-bar" style="margin-right: 8px; color: var(--accent);"></i>Booking
-                            Analytics</h3>
-                    </div>
-                    <div style="padding: 32px;">
-                        <canvas id="reportsChart" height="300"></canvas>
-                    </div>
-                </div>
-            </div>
         </main>
     </div>
 
@@ -367,7 +293,6 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="js/admin.js"></script>
 </body>
