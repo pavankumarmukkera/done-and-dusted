@@ -15,7 +15,7 @@
 </head>
 
 <body>
-    <div class="dashboard-app">
+    <div id="dashboardApp" class="dashboard-app">
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
@@ -31,8 +31,14 @@
                     <li data-view="bookings">
                         <i class="fas fa-calendar-alt"></i> Bookings
                     </li>
+                    <li data-view="calendar">
+                        <i class="fas fa-calendar-check"></i> Calendar
+                    </li>
                     <li data-view="clients">
                         <i class="fas fa-users"></i> Clients
+                    </li>
+                    <li data-view="reports">
+                        <i class="fas fa-chart-bar"></i> Analytics
                     </li>
                 </ul>
             </nav>
@@ -146,9 +152,29 @@
                     <div class="card-header">
                         <h3><i class="fas fa-list" style="margin-right: 8px; color: var(--accent);"></i>All Bookings
                         </h3>
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="searchBookings" placeholder="Search bookings...">
+                        <div class="filters">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="searchBookings" placeholder="Search bookings...">
+                            </div>
+                            <select id="filterStatus">
+                                <option value="">All Statuses</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Confirmed">Confirmed</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
+                            <select id="filterService">
+                                <option value="">All Services</option>
+                                <option value="Domestic Cleaning">Domestic Cleaning</option>
+                                <option value="Commercial Cleaning">Commercial Cleaning</option>
+                                <option value="Deep Clean">Deep Clean</option>
+                                <option value="End of Tenancy">End of Tenancy</option>
+                                <option value="AirBnB Cleaning">AirBnB Cleaning</option>
+                                <option value="HMO Cleaning">HMO Cleaning</option>
+                            </select>
+                            <button class="btn btn-secondary" id="resetFilters"><i class="fas fa-undo"></i> Reset</button>
+                            <button class="btn btn-secondary" id="exportCsv"><i class="fas fa-file-export"></i> Export CSV</button>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -158,13 +184,14 @@
                                     <th>Customer Name</th>
                                     <th>Service Type</th>
                                     <th>Date</th>
+                                    <th>Cleaner</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="allBookingsTable">
                                 <tr>
-                                    <td colspan="5" class="loading">Loading bookings</td>
+                                    <td colspan="6" class="loading">Loading bookings</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -182,6 +209,58 @@
                     <div id="clientsTableContainer">
                         <div class="loading">Loading clients</div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Calendar View -->
+            <div id="calendarView" class="view-section hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-calendar-check" style="margin-right: 8px; color: var(--accent);"></i>Calendar</h3>
+                    </div>
+                    <div id="fullCalendar" class="full-calendar-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports View -->
+            <div id="reportsView" class="view-section hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-bar" style="margin-right: 8px; color: var(--accent);"></i>Analytics</h3>
+                    </div>
+                    <div class="dashboard-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon icon-yellow"><i class="fas fa-hourglass-half"></i></div>
+                            <div class="stat-info">
+                                <h3>Pending</h3>
+                                <p id="statPending">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon icon-blue"><i class="fas fa-check-circle"></i></div>
+                            <div class="stat-info">
+                                <h3>Confirmed</h3>
+                                <p id="statConfirmed">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon icon-green"><i class="fas fa-flag-checkered"></i></div>
+                            <div class="stat-info">
+                                <h3>Completed</h3>
+                                <p id="statCompleted">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon icon-red"><i class="fas fa-times-circle"></i></div>
+                            <div class="stat-info">
+                                <h3>Cancelled</h3>
+                                <p id="statCancelled">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <canvas id="reportsChart" height="160"></canvas>
                 </div>
             </div>
         </main>
@@ -213,12 +292,20 @@
                     <p id="modalService"></p>
                 </div>
                 <div class="detail-group">
+                    <label><i class="fas fa-user-check"></i> Assigned Cleaner</label>
+                    <input type="text" id="modalCleaner" placeholder="Assign a cleaner">
+                </div>
+                <div class="detail-group">
                     <label><i class="fas fa-calendar"></i> Date</label>
                     <p id="modalDate"></p>
                 </div>
                 <div class="detail-group">
-                    <label><i class="fas fa-sticky-note"></i> Notes</label>
+                    <label><i class="fas fa-sticky-note"></i> Customer Notes</label>
                     <p id="modalNotes"></p>
+                </div>
+                <div class="detail-group">
+                    <label><i class="fas fa-clipboard-list"></i> Admin Notes</label>
+                    <textarea id="modalAdminNotes" rows="3" placeholder="Internal notes for this booking"></textarea>
                 </div>
                 <div class="detail-group">
                     <label><i class="fas fa-flag"></i> Update Status</label>
@@ -228,6 +315,15 @@
                         <option value="Completed">🟢 Completed</option>
                         <option value="Cancelled">🔴 Cancelled</option>
                     </select>
+                </div>
+                <div class="detail-group">
+                    <label><i class="fab fa-whatsapp"></i> WhatsApp Confirmation</label>
+                    <div style="display:flex; gap:12px; align-items:center; flex-wrap: wrap;">
+                        <label style="display:flex; gap:8px; align-items:center;">
+                            <input type="checkbox" id="modalWhatsappConfirmed"> Marked as confirmed
+                        </label>
+                        <button class="btn btn-secondary btn-sm" id="modalWhatsappSend"><i class="fab fa-whatsapp"></i> Send</button>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -265,17 +361,21 @@
                     <div class="form-group">
                         <label>Service Type</label>
                         <select id="newBookingService" required>
-                            <option value="Domestic Cleaning">🏠 Domestic Cleaning</option>
-                            <option value="Commercial Cleaning">🏢 Commercial Cleaning</option>
-                            <option value="Deep Clean">✨ Deep Clean</option>
-                            <option value="End of Tenancy">🔑 End of Tenancy</option>
-                            <option value="AirBnB Cleaning">✈️ AirBnB Cleaning</option>
-                            <option value="HMO Cleaning">👥 HMO Cleaning</option>
+                            <option value="Domestic Cleaning">Domestic Cleaning</option>
+                            <option value="Commercial Cleaning">Commercial Cleaning</option>
+                            <option value="Deep Clean">Deep Clean</option>
+                            <option value="End of Tenancy">End of Tenancy</option>
+                            <option value="AirBnB Cleaning">AirBnB Cleaning</option>
+                            <option value="HMO Cleaning">HMO Cleaning</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Preferred Date</label>
                         <input type="date" id="newBookingDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Assign Cleaner (optional)</label>
+                        <input type="text" id="newBookingCleaner" placeholder="Cleaner name">
                     </div>
                     <div class="form-group">
                         <label>Additional Notes</label>
@@ -292,6 +392,7 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="js/supabase-config.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="js/admin.js"></script>

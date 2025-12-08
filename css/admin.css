@@ -83,6 +83,11 @@ h6 {
     display: none !important;
 }
 
+.role-cleaner #btnNewBooking,
+.role-cleaner .btn-danger {
+    display: none !important;
+}
+
 /* ==================== LOGIN SECTION ==================== */
 .login-section {
     min-height: 100vh;
@@ -561,6 +566,8 @@ h6 {
     padding: 20px 24px;
     border-bottom: 1px solid var(--soft-grey);
     background: linear-gradient(135deg, rgba(0, 94, 140, 0.03) 0%, rgba(119, 191, 219, 0.05) 100%);
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 .card-header h3 {
@@ -617,6 +624,34 @@ h6 {
     color: var(--text-muted);
 }
 
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.filters select {
+    padding: 10px 12px;
+    border: 2px solid var(--soft-grey);
+    border-radius: var(--border-radius-sm);
+    background: var(--white);
+    font-family: inherit;
+    font-weight: 600;
+    color: var(--text-dark);
+    transition: var(--transition);
+}
+
+.filters select:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 4px rgba(0, 94, 140, 0.1);
+}
+
+.filters .btn {
+    height: 42px;
+}
+
 /* ==================== TABLES ==================== */
 .table-responsive {
     width: 100%;
@@ -645,6 +680,7 @@ h6 {
     padding: 16px 24px;
     border-bottom: 1px solid var(--border-light);
     color: var(--text-dark);
+    word-break: break-word;
 }
 
 .table tr:last-child td {
@@ -657,6 +693,27 @@ h6 {
 
 .table tbody tr:hover {
     background-color: rgba(119, 191, 219, 0.08);
+}
+
+.table td:last-child {
+    white-space: nowrap;
+}
+
+.table td button {
+    margin-bottom: 6px;
+}
+
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.filters .search-box,
+.filters select,
+.filters .btn {
+    flex-shrink: 0;
 }
 
 /* ==================== STATUS BADGES ==================== */
@@ -744,6 +801,68 @@ h6 {
 
 .calendar-day.today.has-event::after {
     background: white;
+}
+
+/* ==================== FULL CALENDAR ==================== */
+.full-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(120px, 1fr));
+    gap: 12px;
+    padding: 16px;
+}
+
+.full-cal-day {
+    background: var(--white);
+    border: 1px solid var(--soft-grey);
+    border-radius: var(--border-radius-sm);
+    min-height: 120px;
+    padding: 12px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.full-cal-day.empty {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.full-cal-date {
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.full-cal-events {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cal-event {
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    color: #0f172a;
+    background: var(--bg-page);
+    border-left: 4px solid var(--primary-blue);
+}
+
+.cal-event.status-pending {
+    border-left-color: var(--warning);
+}
+
+.cal-event.status-confirmed {
+    border-left-color: var(--primary-blue);
+}
+
+.cal-event.status-completed {
+    border-left-color: var(--success);
+}
+
+.cal-event.status-cancelled {
+    border-left-color: var(--danger);
 }
 
 /* ==================== MODAL ==================== */
@@ -989,5 +1108,23 @@ h6 {
 
     .topbar h2 {
         font-size: 1.5rem;
+    }
+
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .table td,
+    .table th {
+        padding: 12px 14px;
+    }
+
+    .filters {
+        width: 100%;
+    }
+
+    .filters .search-box input {
+        width: 100%;
     }
 }

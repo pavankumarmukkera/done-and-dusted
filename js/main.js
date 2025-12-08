@@ -121,18 +121,45 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- Service Card Toggle ---
+    const serviceCards = document.querySelectorAll('.service-card');
+
+    function toggleServiceCard(card) {
+        const isExpanded = card.classList.contains('expanded');
+
+        serviceCards.forEach(c => {
+            c.classList.remove('expanded');
+            c.setAttribute('aria-expanded', 'false');
+            const label = c.querySelector('.service-toggle span');
+            if (label) label.textContent = 'Tap to read more';
+        });
+
+        if (!isExpanded) {
+            card.classList.add('expanded');
+            card.setAttribute('aria-expanded', 'true');
+            const label = card.querySelector('.service-toggle span');
+            if (label) label.textContent = 'Tap to hide details';
+        }
+    }
+
+    serviceCards.forEach(card => {
+        card.addEventListener('click', () => toggleServiceCard(card));
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleServiceCard(card);
+            }
+        });
+    });
+
     // --- Enhanced Booking Form Handling ---
     const bookingForm = document.getElementById('bookingForm');
     if (bookingForm) {
         bookingForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const formStatus = document.getElementById('formStatus');
             const btn = bookingForm.querySelector('button');
             const originalText = btn.innerText;
-
-            // Visual feedback state
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-            btn.style.opacity = '0.8';
-            btn.disabled = true;
 
             // Collect form data
             const formData = new FormData(bookingForm);
@@ -146,6 +173,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 status: 'Pending'
             };
 
+            const setFormStatus = (message, type = 'info') => {
+                if (!formStatus) return;
+                formStatus.textContent = message;
+                formStatus.className = `form-status ${type === 'error' ? 'error' : type === 'success' ? 'success' : ''}`;
+            };
+
+            // Client-side validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const phoneDigits = (booking.phone || '').replace(/\D/g, '');
+
+            if (!booking.name || !booking.email || !booking.phone || !booking.service || !booking.date) {
+                setFormStatus('Please complete all required fields.', 'error');
+                return;
+            }
+
+            if (!emailRegex.test(booking.email)) {
+                setFormStatus('Enter a valid email address.', 'error');
+                return;
+            }
+
+            if (phoneDigits.length < 10 || phoneDigits.length > 15) {
+                setFormStatus('Enter a valid phone number (10–15 digits).', 'error');
+                return;
+            }
+
+            // Visual feedback state
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            btn.style.opacity = '0.8';
+            btn.disabled = true;
+            setFormStatus('Submitting your request...', 'info');
+
             // Save to Supabase Database
             try {
                 const { error } = await supabase
@@ -158,6 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.innerHTML = '<i class="fas fa-check"></i> Request Sent!';
                 btn.style.backgroundColor = '#10b981'; // Green color
                 btn.style.opacity = '1';
+                setFormStatus('Request received! We will contact you shortly.', 'success');
 
                 // Show Toast Notification
                 showToast('Booking request received! We will contact you shortly.', 'success');
@@ -169,12 +228,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.innerText = originalText;
                     btn.style.backgroundColor = '';
                     btn.disabled = false;
+                    setFormStatus('');
                 }, 3000);
 
             } catch (error) {
                 console.error('Booking Error:', error);
                 btn.innerHTML = '<i class="fas fa-times"></i> Error. Try Again.';
                 btn.style.backgroundColor = '#ef4444'; // Red color
+                setFormStatus('Failed to submit booking. Please try again.', 'error');
 
                 showToast('Failed to submit booking. Please try again.', 'error');
 
@@ -182,6 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.innerText = originalText;
                     btn.style.backgroundColor = '';
                     btn.disabled = false;
+                    setFormStatus('');
                 }, 3000);
             }
         });

@@ -37,7 +37,7 @@
                 <ul class="nav-links">
                     <li><a href="#hero">Home</a></li>
                     <li><a href="#services">Services</a></li>
-                    <li><a href="#about">About</a></li>
+                    <li><a href="#founder">About</a></li>
                     <li><a href="#booking">Book Now</a></li>
                 </ul>
                 <div class="hamburger" aria-label="Toggle navigation menu"><i class="fas fa-bars"></i></div>
@@ -50,7 +50,7 @@
         <section id="hero" class="hero">
             <div class="hero-bg-overlay"></div>
             <div class="container hero-content">
-                <h1>Professional Cleaning for Your Peace of Mind</h1>
+                <h1>Professional Cleaning Company</h1>
                 <p class="hero-subtext">Domestic • Commercial • Deep Cleans • EOT • AirBnB • HMO</p>
                 <div class="hero-btns">
                     <a href="#booking" class="btn btn-primary">Get a Quote</a>
@@ -67,35 +67,121 @@
                     <p class="section-subtitle">Comprehensive cleaning solutions tailored for you</p>
                 </div>
                 <div class="services-grid">
-                    <div class="service-card">
+                    <div class="service-card" data-service="domestic" tabindex="0" role="button" aria-expanded="false"
+                        aria-controls="service-domestic">
+                        <div class="service-media">
+                            <img src="assets/images/domestic-cleaning.png" alt="Domestic cleaning service">
+                        </div>
                         <div class="icon-box"><i class="fas fa-home"></i></div>
                         <h3>Domestic Cleaning</h3>
-                        <p>Regular home cleaning to keep your living space fresh and tidy.</p>
+                        <p class="service-summary">Regular home cleaning to keep your living space fresh and tidy.</p>
+                        <div class="service-toggle" aria-hidden="true">
+                            <span>Tap to read more</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="service-details" id="service-domestic">
+                            <p>Dusting, vacuuming, mopping, and touchpoint sanitising keep your home guest-ready.</p>
+                            <p>Choose add-ons like bed changes, inside-fridge cleans, or eco-friendly products, and keep
+                                the same trusted cleaner whenever possible.</p>
+                        </div>
                     </div>
-                    <div class="service-card">
+                    <div class="service-card" data-service="commercial" tabindex="0" role="button" aria-expanded="false"
+                        aria-controls="service-commercial">
+                        <div class="service-media">
+                            <img src="assets/images/commercial-cleaning.png" alt="Commercial cleaning service">
+                        </div>
                         <div class="icon-box"><i class="fas fa-building"></i></div>
                         <h3>Commercial Cleaning</h3>
-                        <p>Office and workspace maintenance for a professional business environment.</p>
+                        <p class="service-summary">Office and workspace maintenance for a professional business
+                            environment.</p>
+                        <div class="service-toggle" aria-hidden="true">
+                            <span>Tap to read more</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="service-details" id="service-commercial">
+                            <p>We work quietly around your schedule, handle waste removal, sanitise touchpoints, and
+                                restock essentials.</p>
+                            <p>Keyed/fob access compliant; we follow your security protocols and flex as headcount
+                                shifts through the week.</p>
+                        </div>
                     </div>
-                    <div class="service-card">
+                    <div class="service-card" data-service="deep" tabindex="0" role="button" aria-expanded="false"
+                        aria-controls="service-deep">
+                        <div class="service-media">
+                            <img src="assets/images/deep-clean.png" alt="Deep cleaning service">
+                        </div>
                         <div class="icon-box"><i class="fas fa-magic"></i></div>
                         <h3>Deep Cleans</h3>
-                        <p>Intensive cleaning reaching every corner, perfect for spring cleaning.</p>
+                        <p class="service-summary">Intensive cleaning reaching every corner, perfect for spring cleaning.
+                        </p>
+                        <div class="service-toggle" aria-hidden="true">
+                            <span>Tap to read more</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="service-details" id="service-deep">
+                            <p>Behind appliances, inside cupboards, skirting boards, tiles, vents and high dusting — we
+                                tackle the areas that regular cleans miss for a genuine reset of your space.</p>
+                            <p>Limescale removal, degreasing, and detailed bathroom and kitchen sanitising leave surfaces
+                                brighter and longer-lasting between visits.</p>
+                        </div>
                     </div>
-                    <div class="service-card">
+                    <div class="service-card" data-service="eot" tabindex="0" role="button" aria-expanded="false"
+                        aria-controls="service-eot">
+                        <div class="service-media">
+                            <img src="assets/images/end-of-tenancy.png" alt="End of tenancy cleaning service">
+                        </div>
                         <div class="icon-box"><i class="fas fa-key"></i></div>
                         <h3>End of Tenancy</h3>
-                        <p>Guaranteed pass-rate cleaning for tenants moving out and landlords.</p>
+                        <p class="service-summary">Checklist-driven cleans that help tenants secure deposits and landlords
+                            hand over move-in ready homes.</p>
+                        <div class="service-toggle" aria-hidden="true">
+                            <span>Tap to read more</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="service-details" id="service-eot">
+                            <p>Ovens, hobs, and extractors degreased; cupboards wiped inside and out; bathrooms descaled;
+                                carpets and floors refreshed.</p>
+                            <p>We coordinate key handovers with agents/landlords and can add carpet shampooing or
+                                upholstery refreshes.</p>
+                        </div>
                     </div>
-                    <div class="service-card">
+                    <div class="service-card" data-service="airbnb" tabindex="0" role="button" aria-expanded="false"
+                        aria-controls="service-airbnb">
+                        <div class="service-media">
+                            <img src="assets/images/airbnb-cleaning.jpg" alt="Airbnb cleaning turnaround">
+                        </div>
                         <div class="icon-box"><i class="fas fa-suitcase"></i></div>
                         <h3>AirBnB Cleaning</h3>
-                        <p>Reliable turnover service to ensure 5‑star reviews from your guests.</p>
+                        <p class="service-summary">Reliable turnover service to ensure 5‑star reviews from your guests.
+                        </p>
+                        <div class="service-toggle" aria-hidden="true">
+                            <span>Tap to read more</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="service-details" id="service-airbnb">
+                            <p>We clear bins, reset spaces, stage cushions, and restock toiletries so every guest arrives
+                                to a spotless stay.</p>
+                            <p>Optional welcome packs and maintenance flagging to keep your listing high-performing.</p>
+                        </div>
                     </div>
-                    <div class="service-card">
+                    <div class="service-card" data-service="hmo" tabindex="0" role="button" aria-expanded="false"
+                        aria-controls="service-hmo">
+                        <div class="service-media">
+                            <img src="assets/images/hmo-maintenance.jpg" alt="HMO maintenance cleaning">
+                        </div>
                         <div class="icon-box"><i class="fas fa-users"></i></div>
                         <h3>HMO Maintenance</h3>
-                        <p>Communal area cleaning for Houses in Multiple Occupation.</p>
+                        <p class="service-summary">Communal area cleaning for Houses in Multiple Occupation.</p>
+                        <div class="service-toggle" aria-hidden="true">
+                            <span>Tap to read more</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="service-details" id="service-hmo">
+                            <p>We manage bins, sanitise touchpoints, and keep fire exits clear on a consistent rota that
+                                suits tenant schedules.</p>
+                            <p>Maintenance issues are flagged early, and we can flex visits around inspections or
+                                move-ins.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -153,27 +239,32 @@
                 <div class="testimonials-grid">
                     <div class="testimonial-card">
                         <div class="stars">★★★★★</div>
-                        <p>"Absolutely amazing service. My house has never looked this clean! The team was professional
-                            and friendly."</p>
+                        <p>"Absolutely amazing service. My house has never looked this clean! Professional, punctual, and
+                            thoughtful about the details that matter."</p>
                         <div class="client-info">
                             <img src="assets/images/testimonial-sarah.png" alt="Sarah Jenkins">
                             <h4>Sarah Jenkins</h4>
+                            <small>Domestic clean (weekly)</small>
                         </div>
                     </div>
                     <div class="testimonial-card">
                         <div class="stars">★★★★★</div>
-                        <p>"Used them for an End of Tenancy clean. Got my full deposit back. Highly recommended!"</p>
+                        <p>"End of tenancy clean was spotless — inventory clerk even commented on it. Got the full
+                            deposit back with zero questions."</p>
                         <div class="client-info">
                             <img src="assets/images/testimonial-mike.jpg" alt="Mike Thompson">
                             <h4>Mike Thompson</h4>
+                            <small>End of tenancy</small>
                         </div>
                     </div>
                     <div class="testimonial-card">
                         <div class="stars">★★★★★</div>
-                        <p>"Reliable, thorough, and great value. I use them for my office cleaning every week."</p>
+                        <p>"Reliable, thorough, and great value. Our office stays client-ready every day, and the team
+                            works around our hours seamlessly."</p>
                         <div class="client-info">
                             <img src="assets/images/testimonial-emma.jpg" alt="Emma Wilson">
                             <h4>Emma Wilson</h4>
+                            <small>Commercial cleaning</small>
                         </div>
                     </div>
                 </div>
@@ -226,6 +317,7 @@
                             <textarea id="message" name="message" rows="4"
                                 placeholder="Number of rooms, specific requests..."></textarea>
                         </div>
+                        <div id="formStatus" class="form-status" role="status" aria-live="polite"></div>
                         <button type="submit" class="btn btn-submit">Request Quote</button>
                     </form>
                 </div>
@@ -280,13 +372,15 @@
                 <div class="footer-brand">
                     <h3>Done &amp; Dusted</h3>
                     <p>Hertfordshire's Premier Cleaning Service</p>
+                    <p class="footer-hours"><i class="fas fa-clock"></i> Mon–Sat: 7:00–20:00</p>
+                    <p class="footer-hours"><i class="fas fa-phone"></i> 01923 549026 · 07782 550292</p>
                 </div>
                 <div class="footer-nav">
                     <h4>Quick Links</h4>
                     <ul>
                         <li><a href="#hero">Home</a></li>
                         <li><a href="#services">Services</a></li>
-                        <li><a href="#about">About</a></li>
+                        <li><a href="#founder">About</a></li>
                         <li><a href="#booking">Book Now</a></li>
                     </ul>
                 </div>
@@ -297,6 +391,10 @@
                             rel="noopener noreferrer" aria-label="Visit our Instagram page"><i
                                 class="fab fa-instagram"></i></a>
                         <a href="#" aria-label="Visit our Facebook page"><i class="fab fa-facebook-f"></i></a>
+                    </div>
+                    <div class="footer-links">
+                        <a href="#contact">Contact</a>
+                        <a href="mailto:info@doneanddusted.co.uk">Email</a>
                     </div>
                 </div>
             </div>
