@@ -229,4 +229,235 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 300);
         }, 4000);
     }
+    // --- Chat Widget Logic ---
+    const chatWidget = document.getElementById('chat-widget');
+    const chatToggle = document.getElementById('chat-toggle');
+    const chatWindow = document.getElementById('chat-window');
+    const chatClose = document.getElementById('chat-close');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInputArea = document.getElementById('chat-input-area');
+
+    let chatState = {
+        step: 'init',
+        data: {}
+    };
+
+    if (chatWidget) {
+        // Auto-open chat after 2 seconds
+        setTimeout(() => {
+            if (!chatWindow.classList.contains('active')) {
+                chatWindow.classList.add('active');
+                startConversation();
+            }
+        }, 2000);
+
+        // Toggle Chat Window
+        chatToggle.addEventListener('click', () => {
+            chatWindow.classList.toggle('active');
+            if (chatWindow.classList.contains('active') && chatMessages.children.length === 0) {
+                startConversation();
+            }
+        });
+
+        chatClose.addEventListener('click', () => {
+            chatWindow.classList.remove('active');
+        });
+
+        // Helper: Add Message
+        function addMessage(text, sender = 'bot') {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}`;
+            msgDiv.innerText = text;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Helper: Clear Input Area
+        function clearInputArea() {
+            chatInputArea.innerHTML = '';
+        }
+
+        // Helper: Show Options
+        function showOptions(options) {
+            clearInputArea();
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'chat-options';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'chat-option-btn';
+                btn.innerText = opt.label;
+                btn.onclick = () => handleInput(opt.value, opt.label);
+                optionsDiv.appendChild(btn);
+            });
+
+            chatInputArea.appendChild(optionsDiv);
+        }
+
+        // Helper: Show Input Field
+        function showInput(type = 'text', placeholder = '') {
+            clearInputArea();
+            const group = document.createElement('div');
+            group.className = 'chat-input-group';
+
+            const input = document.createElement(type === 'textarea' ? 'textarea' : 'input');
+            input.className = 'chat-input-field';
+            if (type !== 'textarea') input.type = type;
+            input.placeholder = placeholder;
+
+            const sendBtn = document.createElement('button');
+            sendBtn.className = 'chat-send-btn';
+            sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+
+            const submit = () => {
+                const val = input.value.trim();
+                if (val) handleInput(val);
+            };
+
+            sendBtn.onclick = submit;
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    submit();
+                }
+            });
+
+            group.appendChild(input);
+            group.appendChild(sendBtn);
+            chatInputArea.appendChild(group);
+            input.focus();
+        }
+
+        // Start Conversation
+        function startConversation() {
+            chatState = { step: 'init', data: {} };
+            chatMessages.innerHTML = '';
+            addMessage("Hello! How can we help you today?");
+            setTimeout(() => {
+                showOptions([
+                    { label: 'Request a Quote', value: 'quote' },
+                    { label: 'Contact Us', value: 'contact' },
+                    { label: 'Bulk Enquiry', value: 'bulk' }
+                ]);
+            }, 500);
+        }
+
+        // Handle User Input
+        async function handleInput(value, label = null) {
+            // Display user choice
+            addMessage(label || value, 'user');
+            clearInputArea();
+
+            // Process based on current step
+            setTimeout(async () => {
+                switch (chatState.step) {
+                    case 'init':
+                        if (value === 'contact') {
+                            addMessage("You can reach us at:");
+                            addMessage("📞 01923 549026");
+                            addMessage("✉️ info@doneanddusted.co.uk");
+                            showOptions([{ label: 'Start Over', value: 'restart' }]);
+                            chatState.step = 'finished';
+                        } else {
+                            // Quote or Bulk
+                            chatState.data.type = value === 'bulk' ? 'Bulk Enquiry' : 'Quote Request';
+                            chatState.step = 'name';
+                            addMessage("Great! Let's get some details. What is your full name?");
+                            showInput('text', 'John Doe');
+                        }
+                        break;
+
+                    case 'name':
+                        chatState.data.name = value;
+                        chatState.step = 'email';
+                        addMessage(`Nice to meet you, ${value}. What is your email address?`);
+                        showInput('email', 'john@example.com');
+                        break;
+
+                    case 'email':
+                        if (!value.includes('@')) {
+                            addMessage("Please enter a valid email address.");
+                            showInput('email', 'john@example.com');
+                            return;
+                        }
+                        chatState.data.email = value;
+                        chatState.step = 'phone';
+                        addMessage("And your phone number?");
+                        showInput('tel', '07700 900000');
+                        break;
+
+                    case 'phone':
+                        chatState.data.phone = value;
+                        chatState.step = 'service';
+                        addMessage("Which service do you require?");
+                        showOptions([
+                            { label: 'Domestic Cleaning', value: 'Domestic Cleaning' },
+                            { label: 'Commercial Cleaning', value: 'Commercial Cleaning' },
+                            { label: 'Deep Clean', value: 'Deep Clean' },
+                            { label: 'End of Tenancy', value: 'End of Tenancy' },
+                            { label: 'Other', value: 'Other' }
+                        ]);
+                        break;
+
+                    case 'service':
+                        chatState.data.service = value;
+                        chatState.step = 'date';
+                        addMessage("When would you like this service? (Preferred Date)");
+                        showInput('date');
+                        break;
+
+                    case 'date':
+                        chatState.data.date = value;
+                        chatState.step = 'details';
+                        addMessage("Any additional details we should know?");
+                        showInput('textarea', 'Number of rooms, specific requests...');
+                        break;
+
+                    case 'details':
+                        chatState.data.notes = value;
+                        chatState.step = 'submitting';
+                        addMessage("Thank you! Submitting your request...");
+
+                        // Submit to Supabase
+                        try {
+                            const booking = {
+                                name: chatState.data.name,
+                                email: chatState.data.email,
+                                phone: chatState.data.phone,
+                                service: chatState.data.service,
+                                date: chatState.data.date,
+                                notes: `[${chatState.data.type}] ${chatState.data.notes}`,
+                                status: 'Pending'
+                            };
+
+                            const { error } = await supabase
+                                .from('bookings')
+                                .insert([booking]);
+
+                            if (error) throw error;
+
+                            addMessage("✅ Request received! We will be in touch shortly.");
+                            showOptions([{ label: 'Close Chat', value: 'close' }]);
+                        } catch (err) {
+                            console.error(err);
+                            addMessage("❌ There was an error submitting your request. Please try again or call us.");
+                            showOptions([{ label: 'Try Again', value: 'restart' }]);
+                        }
+                        break;
+
+                    case 'finished':
+                        if (value === 'restart') startConversation();
+                        break;
+
+                    default:
+                        if (value === 'close') {
+                            chatWindow.classList.remove('active');
+                        } else if (value === 'restart') {
+                            startConversation();
+                        }
+                        break;
+                }
+            }, 500);
+        }
+    }
 });

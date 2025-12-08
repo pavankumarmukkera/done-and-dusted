@@ -70,6 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Refresh AOS
                 if (window.AOS) AOS.refresh();
+
+                // Lazy load data for specific views
+                if (viewId === 'clients') {
+                    loadClientsData();
+                }
             });
         });
 
@@ -99,50 +104,104 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // --- Data Functions (Supabase) ---
+// Pagination State
+let currentPage = 1;
+const pageSize = 10;
+
 async function loadDashboardData() {
     try {
-        const { data: bookings, error } = await supabase
+        // 1. Fetch Stats (Parallel)
+        const statsPromise = Promise.all([
+            supabase.from('bookings').select('*', { count: 'exact', head: true }),
+            supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('status', 'Completed'),
+            supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('status', 'Pending')
+        ]);
+
+        // 2. Fetch Recent Bookings (Top 5)
+        const recentPromise = supabase
             .from('bookings')
             .select('*')
-            .order('created_at', { ascending: false });
+            .order('created_at', { ascending: false })
+            .limit(5);
 
-        if (error) throw error;
+        // 3. Fetch Initial Page of All Bookings
+        const from = (currentPage - 1) * pageSize;
+        const to = from + pageSize - 1;
+        const bookingsPromise = supabase
+            .from('bookings')
+            .select('*', { count: 'exact' })
+            .order('created_at', { ascending: false })
+            .range(from, to);
+
+        const [[totalRes, completedRes, pendingRes], recentRes, bookingsRes] = await Promise.all([
+            statsPromise,
+            recentPromise,
+            bookingsPromise
+        ]);
+
+        if (totalRes.error) throw totalRes.error;
+        if (recentRes.error) throw recentRes.error;
+        if (bookingsRes.error) throw bookingsRes.error;
 
         // Update Stats
         const totalEl = document.getElementById('totalBookings');
         const completedEl = document.getElementById('completedBookings');
         const pendingEl = document.getElementById('pendingBookings');
 
-        if (totalEl) totalEl.innerText = bookings.length;
-        if (completedEl) completedEl.innerText = bookings.filter(b => b.status === 'Completed').length;
-        if (pendingEl) pendingEl.innerText = bookings.filter(b => b.status === 'Pending').length;
+        if (totalEl) totalEl.innerText = totalRes.count;
+        if (completedEl) completedEl.innerText = completedRes.count;
+        if (pendingEl) pendingEl.innerText = pendingRes.count;
 
         // Render Tables
-        renderBookingsTable(bookings);
-        renderRecentBookings(bookings);
-        renderClientsTable(bookings);
+        renderRecentBookings(recentRes.data);
+        renderBookingsTable(bookingsRes.data, bookingsRes.count);
+
     } catch (error) {
         console.error('Error loading dashboard data:', error);
         showToast('Failed to load bookings data', 'error');
     }
 }
 
+async function loadClientsData() {
+    const container = document.getElementById('clientsTableContainer');
+    if (container) container.innerHTML = '<div class="loading">Loading clients...</div>';
+
+    try {
+        const { data: bookings, error } = await supabase
+            .from('bookings')
+            .select('name, email, phone, date')
+            .order('date', { ascending: false });
+
+        if (error) throw error;
+        renderClientsTable(bookings);
+    } catch (error) {
+        console.error('Error loading clients:', error);
+        if (container) container.innerHTML = '<div style="color: red; text-align: center; padding: 20px;">Failed to load clients</div>';
+    }
+}
+
 async function searchBookings(searchTerm) {
+    if (!searchTerm) {
+        loadDashboardData();
+        return;
+    }
+
     try {
         const { data: bookings, error } = await supabase
             .from('bookings')
             .select('*')
-            .order('created_at', { ascending: false });
+            .or(`name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,service.ilike.%${searchTerm}%`)
+            .order('created_at', { ascending: false })
+            .limit(50);
 
         if (error) throw error;
 
-        const filtered = bookings.filter(b =>
-            b.name.toLowerCase().includes(searchTerm) ||
-            b.email.toLowerCase().includes(searchTerm) ||
-            b.service.toLowerCase().includes(searchTerm) ||
-            b.date.includes(searchTerm)
-        );
-        renderBookingsTable(filtered);
+        renderBookingsTable(bookings);
+
+        // Hide pagination controls for search results
+        const controls = document.getElementById('paginationControls');
+        if (controls) controls.style.display = 'none';
+
     } catch (error) {
         console.error('Error searching bookings:', error);
     }
@@ -173,7 +232,7 @@ function renderRecentBookings(bookings) {
     });
 }
 
-function renderBookingsTable(bookings) {
+function renderBookingsTable(bookings, totalCount = 0) {
     const tbody = document.getElementById('allBookingsTable');
     if (!tbody) return;
     tbody.innerHTML = '';
@@ -197,6 +256,72 @@ function renderBookingsTable(bookings) {
         `;
         tbody.appendChild(tr);
     });
+
+    // Render Pagination Controls
+    renderPaginationControls(totalCount);
+}
+
+function renderPaginationControls(totalCount) {
+    const existingControls = document.getElementById('paginationControls');
+    if (existingControls) existingControls.remove();
+
+    const totalPages = Math.ceil(totalCount / pageSize);
+    if (totalPages <= 1) return;
+
+    const container = document.createElement('div');
+    container.id = 'paginationControls';
+    container.className = 'pagination-controls';
+    container.style.cssText = 'display: flex; justify-content: center; gap: 10px; margin-top: 20px; align-items: center;';
+
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'btn btn-sm btn-secondary';
+    prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i> Prev';
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.onclick = () => changePage(currentPage - 1);
+
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'btn btn-sm btn-secondary';
+    nextBtn.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.onclick = () => changePage(currentPage + 1);
+
+    const info = document.createElement('span');
+    info.innerText = `Page ${currentPage} of ${totalPages}`;
+    info.style.color = 'var(--text-muted)';
+
+    container.appendChild(prevBtn);
+    container.appendChild(info);
+    container.appendChild(nextBtn);
+
+    const tableContainer = document.querySelector('#bookingsView .table-responsive');
+    if (tableContainer) {
+        tableContainer.after(container);
+    }
+}
+
+async function changePage(newPage) {
+    currentPage = newPage;
+    const tbody = document.getElementById('allBookingsTable');
+    if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="5" class="loading">Loading...</td></tr>';
+    }
+
+    try {
+        const from = (currentPage - 1) * pageSize;
+        const to = from + pageSize - 1;
+
+        const { data: bookings, count, error } = await supabase
+            .from('bookings')
+            .select('*', { count: 'exact' })
+            .order('created_at', { ascending: false })
+            .range(from, to);
+
+        if (error) throw error;
+        renderBookingsTable(bookings, count);
+    } catch (error) {
+        console.error('Error changing page:', error);
+        showToast('Failed to load page', 'error');
+    }
 }
 
 function renderClientsTable(bookings) {
