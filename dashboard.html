@@ -105,7 +105,7 @@
                 <!-- Dashboard Grid -->
                 <div class="dashboard-grid">
                     <!-- Recent Bookings -->
-                    <div class="card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="card grid-full-width" data-aos="fade-up" data-aos-delay="400">
                         <div class="card-header">
                             <h3><i class="fas fa-clock" style="margin-right: 8px; color: var(--accent);"></i>Recent
                                 Bookings</h3>
@@ -130,17 +130,6 @@
                                     </tr>
                                 </tbody>
                             </table>
-                        </div>
-                    </div>
-
-                    <!-- Mini Calendar -->
-                    <div class="card" data-aos="fade-up" data-aos-delay="500">
-                        <div class="card-header">
-                            <h3><i class="fas fa-calendar" style="margin-right: 8px; color: var(--accent);"></i>This
-                                Month</h3>
-                        </div>
-                        <div id="miniCalendar" class="mini-calendar">
-                            <!-- Populated by JS -->
                         </div>
                     </div>
                 </div>
@@ -216,6 +205,11 @@
                 <div class="card">
                     <div class="card-header">
                         <h3><i class="fas fa-calendar-check" style="margin-right: 8px; color: var(--accent);"></i>Calendar</h3>
+                        <div class="calendar-nav">
+                            <button id="prevMonth" class="btn btn-sm btn-secondary"><i class="fas fa-chevron-left"></i></button>
+                            <h4 id="calendarMonthYear">Month Year</h4>
+                            <button id="nextMonth" class="btn btn-sm btn-secondary"><i class="fas fa-chevron-right"></i></button>
+                        </div>
                     </div>
                     <div id="fullCalendar" class="full-calendar-grid">
                         <!-- Populated by JS -->

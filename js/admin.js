@@ -75,13 +75,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (viewId === 'clients') {
                     loadClientsData();
                 }
+                if (viewId === 'calendar') {
+                    renderFullCalendar(currentCalendarDate);
+                }
+                if (viewId === 'reports') {
+                    loadAnalyticsData();
+                }
             });
         });
 
         // Initialize Data from Supabase
         loadDashboardData();
-        initCalendar();
-        initCharts();
+        initFullCalendar();
 
         // Initialize AOS
         if (window.AOS) {
@@ -103,6 +108,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// --- Calendar State ---
+let currentCalendarDate = new Date();
+
+function initFullCalendar() {
+    // Calendar Navigation
+    const prevMonthBtn = document.getElementById('prevMonth');
+    const nextMonthBtn = document.getElementById('nextMonth');
+
+    if (prevMonthBtn) {
+        prevMonthBtn.addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+            renderFullCalendar(currentCalendarDate);
+        });
+    }
+
+    if (nextMonthBtn) {
+        nextMonthBtn.addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+            renderFullCalendar(currentCalendarDate);
+        });
+    }
+}
 // --- Data Functions (Supabase) ---
 // Pagination State
 let currentPage = 1;
@@ -156,9 +183,50 @@ async function loadDashboardData() {
         renderRecentBookings(recentRes.data);
         renderBookingsTable(bookingsRes.data, bookingsRes.count);
 
+        // Load Analytics Data
+        await loadAnalyticsData();
+
     } catch (error) {
         console.error('Error loading dashboard data:', error);
         showToast('Failed to load bookings data', 'error');
+    }
+}
+
+async function loadAnalyticsData() {
+    try {
+        // Fetch all bookings for analytics - consider paginating or server-side aggregation for large datasets
+        const { data: bookings, error } = await supabase
+            .from('bookings')
+            .select('date, status');
+
+        if (error) throw error;
+
+        // 1. Update Stat Cards
+        const statusCounts = {
+            Pending: 0,
+            Confirmed: 0,
+            Completed: 0,
+            Cancelled: 0
+        };
+
+        bookings.forEach(b => {
+            if (b.status in statusCounts) {
+                statusCounts[b.status]++;
+            }
+        });
+
+        document.getElementById('statPending').innerText = statusCounts.Pending;
+        document.getElementById('statConfirmed').innerText = statusCounts.Confirmed;
+        document.getElementById('statCompleted').innerText = statusCounts.Completed;
+        document.getElementById('statCancelled').innerText = statusCounts.Cancelled;
+
+
+        // 2. Initialize Chart with the fetched data
+        initCharts(bookings);
+
+    } catch (error) {
+        console.error('Error loading analytics data:', error);
+        showToast('Failed to load analytics', 'error');
     }
 }
 
@@ -529,50 +597,118 @@ if (newBookingForm) {
     });
 }
 
-// --- Calendar Logic ---
-async function initCalendar() {
-    const grid = document.getElementById('miniCalendar');
-    if (!grid) return;
+async function renderFullCalendar(date) {
+    const calendarGrid = document.getElementById('fullCalendar');
+    const monthYearEl = document.getElementById('calendarMonthYear');
+    if (!calendarGrid || !monthYearEl) return;
 
-    grid.innerHTML = ''; // Clear existing
+    calendarGrid.innerHTML = '<div class="loading">Loading calendar...</div>';
 
-    // Get bookings for calendar
-    let bookedDays = [];
-    try {
-        const { data: bookings, error } = await supabase
-            .from('bookings')
-            .select('date')
-            .gte('date', new Date().toISOString().split('T')[0]);
+    const year = date.getFullYear();
+    const month = date.getMonth(); // 0-indexed
 
-        if (!error && bookings) {
-            bookedDays = bookings.map(b => new Date(b.date).getDate());
-        }
-    } catch (e) {
-        console.error('Error loading calendar data:', e);
+    // Set header text
+    monthYearEl.innerText = date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long'
+    });
+
+    // Get bookings for the month
+    const bookings = await getBookingsForMonth(date);
+    const eventsByDay = {};
+    if (bookings) {
+        bookings.forEach(b => {
+            const day = new Date(b.date).getDate();
+            if (!eventsByDay[day]) {
+                eventsByDay[day] = [];
+            }
+            eventsByDay[day].push(b);
+        });
     }
 
-    const today = new Date().getDate();
 
-    // Simple 30-day grid
-    for (let i = 1; i <= 30; i++) {
-        const day = document.createElement('div');
-        day.className = 'calendar-day';
-        day.innerText = i;
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startDayOfWeek = firstDay.getDay(); // 0 (Sun) - 6 (Sat)
 
-        // Mark days with bookings
-        if (bookedDays.includes(i)) {
-            day.classList.add('has-event');
+    // Clear grid
+    calendarGrid.innerHTML = '';
+
+    // Add day headers
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    dayNames.forEach(name => {
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'full-cal-day-header';
+        dayHeader.innerText = name;
+        calendarGrid.appendChild(dayHeader);
+    });
+
+
+    // Add empty cells for padding
+    for (let i = 0; i < startDayOfWeek; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'full-cal-day empty';
+        calendarGrid.appendChild(emptyCell);
+    }
+
+    // Add day cells
+    for (let i = 1; i <= daysInMonth; i++) {
+        const dayCell = document.createElement('div');
+        dayCell.className = 'full-cal-day';
+
+        const dateEl = document.createElement('div');
+        dateEl.className = 'full-cal-date';
+        dateEl.innerText = i;
+        dayCell.appendChild(dateEl);
+
+        // Add events if any
+        if (eventsByDay[i]) {
+            const eventsContainer = document.createElement('div');
+            eventsContainer.className = 'full-cal-events';
+            eventsByDay[i].forEach(event => {
+                const eventEl = document.createElement('div');
+                eventEl.className = `cal-event status-${event.status.toLowerCase()}`;
+                eventEl.innerHTML = `
+                    <strong>${event.service}</strong>
+                    <span>${event.name}</span>
+                `;
+                eventsContainer.appendChild(eventEl);
+            });
+            dayCell.appendChild(eventsContainer);
         }
-        if (i === today) {
-            day.classList.add('today');
+
+        if (year === new Date().getFullYear() && month === new Date().getMonth() && i === new Date().getDate()) {
+            dayCell.classList.add('today');
         }
 
-        grid.appendChild(day);
+        calendarGrid.appendChild(dayCell);
     }
 }
+async function getBookingsForMonth(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth();
 
+    const firstDay = new Date(year, month, 1).toISOString().split('T')[0];
+    const lastDay = new Date(year, month + 1, 0).toISOString().split('T')[0];
+
+    try {
+        const { data, error } = await supabase
+            .from('bookings')
+            .select('*')
+            .gte('date', firstDay)
+            .lte('date', lastDay);
+
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('Error fetching bookings for month:', error);
+        showToast('Failed to load calendar events', 'error');
+        return [];
+    }
+}
 // --- Charts Logic ---
-async function initCharts() {
+async function initCharts(bookings) {
     const ctx = document.getElementById('reportsChart');
     if (!ctx) return;
 
@@ -581,44 +717,100 @@ async function initCharts() {
         window.myChart.destroy();
     }
 
-    // Get booking stats by month
-    let monthlyData = [0, 0, 0, 0, 0, 0];
-    try {
-        const { data: bookings, error } = await supabase
-            .from('bookings')
-            .select('date, status');
-
-        if (!error && bookings) {
-            bookings.forEach(b => {
-                const month = new Date(b.date).getMonth();
-                if (month >= 0 && month < 6) {
-                    monthlyData[month]++;
-                }
-            });
-        }
-    } catch (e) {
-        console.error('Error loading chart data:', e);
+    // Get booking stats by month (all 12 months)
+    let monthlyData = new Array(12).fill(0); // Initialize for all 12 months
+    if (bookings) {
+        bookings.forEach(b => {
+            const month = new Date(b.date).getMonth(); // 0-indexed (0 = Jan, 11 = Dec)
+            if (month >= 0 && month < 12) { // Ensure month is within valid range
+                monthlyData[month]++;
+            }
+        });
     }
 
     window.myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             datasets: [{
                 label: 'Bookings per Month',
                 data: monthlyData,
-                backgroundColor: '#3b82f6',
-                borderColor: '#0f172a',
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.7)', // January (Red)
+                    'rgba(54, 162, 235, 0.7)', // February (Blue)
+                    'rgba(255, 206, 86, 0.7)', // March (Yellow)
+                    'rgba(75, 192, 192, 0.7)', // April (Green)
+                    'rgba(153, 102, 255, 0.7)', // May (Purple)
+                    'rgba(255, 159, 64, 0.7)', // June (Orange)
+                    'rgba(100, 100, 100, 0.7)', // July (Grey)
+                    'rgba(200, 50, 100, 0.7)', // August
+                    'rgba(50, 200, 100, 0.7)', // September
+                    'rgba(100, 50, 200, 0.7)', // October
+                    'rgba(200, 100, 50, 0.7)', // November
+                    'rgba(50, 100, 200, 0.7)'  // December
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(100, 100, 100, 1)',
+                    'rgba(200, 50, 100, 1)',
+                    'rgba(50, 200, 100, 1)',
+                    'rgba(100, 50, 200, 1)',
+                    'rgba(200, 100, 50, 1)',
+                    'rgba(50, 100, 200, 1)'
+                ],
                 borderWidth: 1
             }]
         },
         options: {
             responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Monthly Booking Overview',
+                    font: {
+                        size: 18,
+                        weight: 'bold'
+                    },
+                    color: '#333'
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(context) {
+                            return `Bookings: ${context.parsed.y}`;
+                        }
+                    }
+                }
+            },
             scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Month',
+                        color: '#555'
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
                 y: {
                     beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Bookings',
+                        color: '#555'
+                    },
                     ticks: {
                         stepSize: 1
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
                     }
                 }
             }
