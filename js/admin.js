@@ -1,115 +1,51 @@
-const ADMIN_USER = {
-    email: 'admin@doneanddusted.co.uk',
-    password: 'admin123',
-    role: 'admin',
-    name: 'Admin'
-};
-
-const CLEANER_USER = {
-    email: 'cleaner@doneanddusted.co.uk',
-    password: 'cleaner123',
-    role: 'cleaner',
-    name: 'Cleaner'
-};
-
-const SESSION_KEY = 'dd_session';
-let sessionUser = null;
-
-function getSession() {
-    try {
-        const raw = localStorage.getItem(SESSION_KEY);
-        return raw ? JSON.parse(raw) : null;
-    } catch (e) {
-        return null;
-    }
-}
-
-function setSession(data) {
-    localStorage.setItem(SESSION_KEY, JSON.stringify(data));
-    if (data.role === 'admin') {
-        localStorage.setItem('dd_admin_logged_in', 'true'); // backward compatibility
-    }
-}
-
-function clearSession() {
-    localStorage.removeItem(SESSION_KEY);
-    localStorage.removeItem('dd_admin_logged_in');
-}
-
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Shared Logic ---
     const loginForm = document.getElementById('loginForm');
     const logoutBtn = document.getElementById('logoutBtn');
     const dashboardApp = document.getElementById('dashboardApp');
 
     // --- Login Page Logic ---
     if (loginForm) {
-        const existing = getSession();
-        if (existing) {
+        // Check if already logged in
+        if (localStorage.getItem('dd_admin_logged_in') === 'true') {
             window.location.href = 'dashboard.html';
         }
 
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value.trim().toLowerCase();
+            const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const role = document.getElementById('role').value;
 
-            const matchedUser = [ADMIN_USER, CLEANER_USER].find(
-                u => u.email.toLowerCase() === email && u.password === password && u.role === role
-            ) || (
-                role === 'cleaner' && password === CLEANER_USER.password
-                    ? { email, role: 'cleaner', name: email.split('@')[0] || 'Cleaner' }
-                    : null
-            );
-
-            if (matchedUser) {
-                setSession({ email: matchedUser.email, role: matchedUser.role, name: matchedUser.name });
+            if (email === 'admin@doneanddusted.co.uk' && password === 'admin123') {
+                localStorage.setItem('dd_admin_logged_in', 'true');
+                // Simulate loading/redirect
                 const btn = loginForm.querySelector('button');
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
-                const redirectUrl = matchedUser.role === 'cleaner' ? 'cleaner-dashboard.html' : 'dashboard.html';
                 setTimeout(() => {
-                    window.location.href = redirectUrl;
-                }, 400);
+                    window.location.href = 'dashboard.html';
+                }, 800);
             } else {
-                showToast('Invalid credentials. Please try again.', 'error');
+                alert('Invalid credentials. Please try again.');
             }
         });
     }
 
     // --- Dashboard Page Logic ---
     if (dashboardApp) {
-        sessionUser = getSession();
-        if (!sessionUser) {
+        // Auth Check
+        if (localStorage.getItem('dd_admin_logged_in') !== 'true') {
             window.location.href = 'index.html';
-            return;
+            return; // Stop execution
         }
 
-        const isCleaner = sessionUser.role === 'cleaner';
-        isCleanerSession = isCleaner;
-        const isCleanerPage = window.location.pathname.endsWith('cleaner-dashboard.html');
-
-        if (isCleaner && !isCleanerPage) {
-            window.location.href = 'cleaner-dashboard.html';
-            return;
-        }
-        if (!isCleaner && isCleanerPage) {
-            window.location.href = 'dashboard.html';
-            return;
-        }
-
+        // Logout
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
                 if (confirm('Are you sure you want to logout?')) {
-                    clearSession();
+                    localStorage.removeItem('dd_admin_logged_in');
                     window.location.href = 'index.html';
                 }
             });
-        }
-
-        // Hide admin-only controls for cleaners
-        if (isCleaner) {
-            document.body.classList.add('role-cleaner');
-            document.getElementById('btnNewBooking')?.classList.add('hidden');
         }
 
         // Navigation
@@ -119,35 +55,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
         navItems.forEach(item => {
             item.addEventListener('click', () => {
+                // Active State
                 navItems.forEach(nav => nav.classList.remove('active'));
                 item.classList.add('active');
 
+                // Switch View
                 const viewId = item.getAttribute('data-view');
                 views.forEach(view => view.classList.add('hidden'));
                 const targetView = document.getElementById(`${viewId}View`);
                 if (targetView) targetView.classList.remove('hidden');
 
+                // Update Title
                 pageTitle.innerText = item.innerText.trim();
 
+                // Refresh AOS
                 if (window.AOS) AOS.refresh();
 
+                // Lazy load data for specific views
                 if (viewId === 'clients') {
                     loadClientsData();
-                }
-                if (viewId === 'calendar') {
-                    renderFullCalendar();
-                }
-                if (viewId === 'reports') {
-                    initCharts();
                 }
             });
         });
 
+        // Initialize Data from Supabase
         loadDashboardData();
         initCalendar();
         initCharts();
-        renderFullCalendar();
 
+        // Initialize AOS
         if (window.AOS) {
             AOS.init({
                 duration: 600,
@@ -156,102 +92,48 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // Initialize Search
         const searchInput = document.getElementById('searchBookings');
-        const filterStatus = document.getElementById('filterStatus');
-        const filterService = document.getElementById('filterService');
-        const resetFilters = document.getElementById('resetFilters');
-
-        const applyFilters = () => {
-            const searchTerm = (searchInput?.value || '').trim().toLowerCase();
-            filterState.search = searchTerm;
-            filterState.status = filterStatus?.value || '';
-            filterState.service = filterService?.value || '';
-            loadBookingsWithFilters();
-        };
-
-        searchInput?.addEventListener('input', applyFilters);
-        filterStatus?.addEventListener('change', applyFilters);
-        filterService?.addEventListener('change', applyFilters);
-        resetFilters?.addEventListener('click', () => {
-            if (searchInput) searchInput.value = '';
-            if (filterStatus) filterStatus.value = '';
-            if (filterService) filterService.value = '';
-            filterState = { search: '', status: '', service: '' };
-            loadDashboardData();
-        });
-
-        document.getElementById('exportCsv')?.addEventListener('click', () => exportBookings('csv'));
+        if (searchInput) {
+            searchInput.addEventListener('input', async (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                await searchBookings(searchTerm);
+            });
+        }
     }
 });
 
 // --- Data Functions (Supabase) ---
-// Pagination & Filter State
+// Pagination State
 let currentPage = 1;
 const pageSize = 10;
-let filterState = { search: '', status: '', service: '' };
-let isCleanerSession = false;
-let cleanerFilterDisabled = false;
-
-function isMissingCleanerColumn(error) {
-    const msg = (error?.message || '').toLowerCase();
-    const details = (error?.details || '').toLowerCase();
-    return msg.includes('cleaner') || details.includes('cleaner');
-}
-
-function applyRoleFilter(query) {
-    if (!isCleanerSession || !sessionUser || cleanerFilterDisabled) return query;
-    return query.eq('cleaner', sessionUser.name);
-}
-
-function applyFilterParams(query) {
-    if (filterState.status) {
-        query = query.eq('status', filterState.status);
-    }
-    if (filterState.service) {
-        query = query.eq('service', filterState.service);
-    }
-    if (filterState.search) {
-        const term = filterState.search;
-        query = query.or(`name.ilike.%${term}%,email.ilike.%${term}%,service.ilike.%${term}%`);
-    }
-    return query;
-}
-
-function buildBookingsQuery({ withCount = false, rangeFrom = null, rangeTo = null } = {}) {
-    let query = supabase
-        .from('bookings')
-        .select('*', { count: withCount ? 'exact' : undefined });
-
-    query = applyRoleFilter(query);
-    query = applyFilterParams(query);
-    query = query.order('created_at', { ascending: false });
-
-    if (rangeFrom !== null && rangeTo !== null) {
-        query = query.range(rangeFrom, rangeTo);
-    }
-    return query;
-}
 
 async function loadDashboardData() {
     try {
-        // 1. Fetch Stats (Parallel) - role aware
+        // 1. Fetch Stats (Parallel)
         const statsPromise = Promise.all([
-            applyRoleFilter(supabase.from('bookings').select('*', { count: 'exact', head: true })),
-            applyRoleFilter(supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('status', 'Completed')),
-            applyRoleFilter(supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('status', 'Pending')),
-            applyRoleFilter(supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('status', 'Confirmed')),
-            applyRoleFilter(supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('status', 'Cancelled'))
+            supabase.from('bookings').select('*', { count: 'exact', head: true }),
+            supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('status', 'Completed'),
+            supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('status', 'Pending')
         ]);
 
-        // 2. Fetch Recent Bookings (Top 5, respects filters & role)
-        const recentPromise = buildBookingsQuery().limit(5);
+        // 2. Fetch Recent Bookings (Top 5)
+        const recentPromise = supabase
+            .from('bookings')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(5);
 
-        // 3. Fetch Initial Page of All Bookings (with filters)
+        // 3. Fetch Initial Page of All Bookings
         const from = (currentPage - 1) * pageSize;
         const to = from + pageSize - 1;
-        const bookingsPromise = buildBookingsQuery({ withCount: true, rangeFrom: from, rangeTo: to });
+        const bookingsPromise = supabase
+            .from('bookings')
+            .select('*', { count: 'exact' })
+            .order('created_at', { ascending: false })
+            .range(from, to);
 
-        const [[totalRes, completedRes, pendingRes, confirmedRes, cancelledRes], recentRes, bookingsRes] = await Promise.all([
+        const [[totalRes, completedRes, pendingRes], recentRes, bookingsRes] = await Promise.all([
             statsPromise,
             recentPromise,
             bookingsPromise
@@ -265,18 +147,10 @@ async function loadDashboardData() {
         const totalEl = document.getElementById('totalBookings');
         const completedEl = document.getElementById('completedBookings');
         const pendingEl = document.getElementById('pendingBookings');
-        const confirmedEl = document.getElementById('statConfirmed');
-        const cancelledEl = document.getElementById('statCancelled');
-        const statPending = document.getElementById('statPending');
-        const statCompleted = document.getElementById('statCompleted');
 
         if (totalEl) totalEl.innerText = totalRes.count;
         if (completedEl) completedEl.innerText = completedRes.count;
         if (pendingEl) pendingEl.innerText = pendingRes.count;
-        if (confirmedEl) confirmedEl.innerText = confirmedRes.count;
-        if (cancelledEl) cancelledEl.innerText = cancelledRes.count;
-        if (statPending) statPending.innerText = pendingRes.count;
-        if (statCompleted) statCompleted.innerText = completedRes.count;
 
         // Render Tables
         renderRecentBookings(recentRes.data);
@@ -284,10 +158,6 @@ async function loadDashboardData() {
 
     } catch (error) {
         console.error('Error loading dashboard data:', error);
-        if (isCleanerSession && isMissingCleanerColumn(error) && !cleanerFilterDisabled) {
-            cleanerFilterDisabled = true;
-            return loadDashboardData();
-        }
         showToast('Failed to load bookings data', 'error');
     }
 }
@@ -297,12 +167,10 @@ async function loadClientsData() {
     if (container) container.innerHTML = '<div class="loading">Loading clients...</div>';
 
     try {
-        const { data: bookings, error } = await applyRoleFilter(
-            supabase
-                .from('bookings')
-                .select('name, email, phone, date, cleaner')
-                .order('date', { ascending: false })
-        );
+        const { data: bookings, error } = await supabase
+            .from('bookings')
+            .select('name, email, phone, date')
+            .order('date', { ascending: false });
 
         if (error) throw error;
         renderClientsTable(bookings);
@@ -312,32 +180,30 @@ async function loadClientsData() {
     }
 }
 
-async function loadBookingsWithFilters(pageReset = true) {
-    if (pageReset) currentPage = 1;
-
-    const tbody = document.getElementById('allBookingsTable');
-    if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="6" class="loading">Loading...</td></tr>';
+async function searchBookings(searchTerm) {
+    if (!searchTerm) {
+        loadDashboardData();
+        return;
     }
 
     try {
-        const from = (currentPage - 1) * pageSize;
-        const to = from + pageSize - 1;
-        const { data: bookings, count, error } = await buildBookingsQuery({
-            withCount: true,
-            rangeFrom: from,
-            rangeTo: to
-        });
+        const { data: bookings, error } = await supabase
+            .from('bookings')
+            .select('*')
+            .or(`name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,service.ilike.%${searchTerm}%`)
+            .order('created_at', { ascending: false })
+            .limit(50);
 
         if (error) throw error;
-        renderBookingsTable(bookings, count);
+
+        renderBookingsTable(bookings);
+
+        // Hide pagination controls for search results
+        const controls = document.getElementById('paginationControls');
+        if (controls) controls.style.display = 'none';
+
     } catch (error) {
-        console.error('Error loading filtered bookings:', error);
-        if (isCleanerSession && isMissingCleanerColumn(error) && !cleanerFilterDisabled) {
-            cleanerFilterDisabled = true;
-            return loadBookingsWithFilters(false);
-        }
-        showToast('Failed to load bookings', 'error');
+        console.error('Error searching bookings:', error);
     }
 }
 
@@ -355,13 +221,12 @@ function renderRecentBookings(bookings) {
     const recent = bookings.slice(0, 5);
 
     recent.forEach(booking => {
-        const statusLabel = booking.status || 'Pending';
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${booking.name}</td>
             <td>${booking.service}</td>
             <td>${formatDate(booking.date)}</td>
-            <td><span class="status-badge status-${statusLabel.toLowerCase()}">${statusLabel}</span></td>
+            <td><span class="status-badge status-${booking.status.toLowerCase()}">${booking.status}</span></td>
         `;
         tbody.appendChild(tr);
     });
@@ -373,22 +238,20 @@ function renderBookingsTable(bookings, totalCount = 0) {
     tbody.innerHTML = '';
 
     if (bookings.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #666;">No bookings found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #666;">No bookings found</td></tr>';
         return;
     }
 
     bookings.forEach(booking => {
-        const statusLabel = booking.status || 'Pending';
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${booking.name}</td>
             <td>${booking.service}</td>
             <td>${formatDate(booking.date)}</td>
-            <td>${booking.cleaner || 'Unassigned'}</td>
-            <td><span class="status-badge status-${statusLabel.toLowerCase()}">${statusLabel}</span></td>
+            <td><span class="status-badge status-${booking.status.toLowerCase()}">${booking.status}</span></td>
             <td>
                 <button class="btn btn-sm btn-view" onclick="openBookingModal(${booking.id})"><i class="fas fa-eye"></i> View</button>
-                ${isCleanerSession ? '' : `<button class="btn btn-sm btn-danger" onclick="deleteBooking(${booking.id})"><i class="fas fa-trash"></i></button>`}
+                <button class="btn btn-sm btn-danger" onclick="deleteBooking(${booking.id})"><i class="fas fa-trash"></i></button>
             </td>
         `;
         tbody.appendChild(tr);
@@ -440,11 +303,21 @@ async function changePage(newPage) {
     currentPage = newPage;
     const tbody = document.getElementById('allBookingsTable');
     if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="6" class="loading">Loading...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="loading">Loading...</td></tr>';
     }
 
     try {
-        await loadBookingsWithFilters(false);
+        const from = (currentPage - 1) * pageSize;
+        const to = from + pageSize - 1;
+
+        const { data: bookings, count, error } = await supabase
+            .from('bookings')
+            .select('*', { count: 'exact' })
+            .order('created_at', { ascending: false })
+            .range(from, to);
+
+        if (error) throw error;
+        renderBookingsTable(bookings, count);
     } catch (error) {
         console.error('Error changing page:', error);
         showToast('Failed to load page', 'error');
@@ -477,26 +350,18 @@ function renderClientsTable(bookings) {
                         <th>Email</th>
                         <th>Phone</th>
                         <th>Last Booking</th>
-                        <th>Assign Cleaner</th>
                     </tr>
                 </thead>
                 <tbody>
     `;
 
-    Object.values(clients).forEach((client, idx) => {
-        const inputId = `assignCleaner-${idx}`;
+    Object.values(clients).forEach(client => {
         html += `
             <tr>
                 <td>${client.name}</td>
                 <td>${client.email}</td>
                 <td>${client.phone}</td>
                 <td>${formatDate(client.lastBooking)}</td>
-                <td style="min-width:220px;">
-                    <div style="display:flex; gap:8px; align-items:center;">
-                        <input id="${inputId}" type="text" placeholder="Cleaner name" style="flex:1; padding:8px; border:1px solid var(--border-light); border-radius:8px;">
-                        <button class="btn btn-sm btn-primary" onclick="assignCleanerToClient('${client.email}', '${inputId}')"><i class="fas fa-user-check"></i></button>
-                    </div>
-                </td>
             </tr>
         `;
     });
@@ -505,39 +370,8 @@ function renderClientsTable(bookings) {
     container.innerHTML = html;
 }
 
-window.assignCleanerToClient = async function (email, inputId) {
-    const input = document.getElementById(inputId);
-    const cleanerName = input?.value.trim();
-    if (!cleanerName) {
-        showToast('Enter a cleaner name', 'error');
-        return;
-    }
-
-    try {
-        const { error } = await supabase
-            .from('bookings')
-            .update({ cleaner: cleanerName, updated_at: new Date().toISOString() })
-            .eq('email', email);
-
-        if (error) {
-            if (isMissingCleanerColumn(error)) {
-                showToast('Add a "cleaner" column in Supabase to assign cleaners.', 'error');
-                return;
-            }
-            throw error;
-        }
-
-        showToast(`Assigned to ${cleanerName} for ${email}`, 'success');
-        await loadDashboardData();
-    } catch (err) {
-        console.error('Assign cleaner error', err);
-        showToast('Failed to assign cleaner', 'error');
-    }
-};
-
 // --- Modal Logic ---
 let currentBookingId = null;
-let currentBookingData = null;
 
 window.openBookingModal = async function (id) {
     try {
@@ -551,7 +385,6 @@ window.openBookingModal = async function (id) {
         if (!booking) return;
 
         currentBookingId = id;
-        currentBookingData = booking;
 
         document.getElementById('modalName').innerText = booking.name;
         document.getElementById('modalEmail').innerText = booking.email;
@@ -559,12 +392,6 @@ window.openBookingModal = async function (id) {
         document.getElementById('modalService').innerText = booking.service;
         document.getElementById('modalDate').innerText = formatDate(booking.date);
         document.getElementById('modalNotes').innerText = booking.notes || 'No notes.';
-        const cleanerInput = document.getElementById('modalCleaner');
-        if (cleanerInput) cleanerInput.value = booking.cleaner || '';
-        const adminNotes = document.getElementById('modalAdminNotes');
-        if (adminNotes) adminNotes.value = booking.admin_notes || '';
-        const whatsappChk = document.getElementById('modalWhatsappConfirmed');
-        if (whatsappChk) whatsappChk.checked = Boolean(booking.whatsapp_confirmed);
 
         const statusBadge = document.getElementById('modalStatus');
         statusBadge.innerText = booking.status;
@@ -593,7 +420,6 @@ function closeModal() {
         setTimeout(() => modal.classList.add('hidden'), 300);
     }
     currentBookingId = null;
-    currentBookingData = null;
 }
 
 // New Booking Modal Logic
@@ -633,10 +459,6 @@ document.getElementById('deleteBookingBtn')?.addEventListener('click', async () 
     }
 });
 
-document.getElementById('modalWhatsappSend')?.addEventListener('click', async () => {
-    await sendWhatsappConfirmation();
-});
-
 window.deleteBooking = async function (id) {
     if (confirm('Are you sure you want to delete this booking?')) {
         try {
@@ -658,38 +480,14 @@ window.deleteBooking = async function (id) {
 
 window.updateBookingStatus = async function (id, newStatus) {
     try {
-        const adminNotes = document.getElementById('modalAdminNotes')?.value || '';
-        const cleaner = document.getElementById('modalCleaner')?.value || '';
-        const whatsappConfirmed = document.getElementById('modalWhatsappConfirmed')?.checked || false;
-
         const { error } = await supabase
             .from('bookings')
-            .update({
-                status: newStatus,
-                updated_at: new Date().toISOString(),
-                admin_notes: adminNotes,
-                cleaner,
-                whatsapp_confirmed: whatsappConfirmed
-            })
+            .update({ status: newStatus, updated_at: new Date().toISOString() })
             .eq('id', id);
 
-        if (error) {
-            if (isMissingCleanerColumn(error)) {
-                const fallback = await supabase
-                    .from('bookings')
-                    .update({
-                        status: newStatus,
-                        updated_at: new Date().toISOString()
-                    })
-                    .eq('id', id);
-                if (fallback.error) throw fallback.error;
-            } else {
-                throw error;
-            }
-        }
+        if (error) throw error;
 
         showToast(`Status updated to ${newStatus}`, 'success');
-        await sendEmailNotifications('status-update', { id, status: newStatus, cleaner, admin_notes: adminNotes });
         await loadDashboardData(); // Refresh UI
         closeModal();
     } catch (error) {
@@ -709,38 +507,18 @@ if (newBookingForm) {
             phone: document.getElementById('newBookingPhone').value,
             service: document.getElementById('newBookingService').value,
             date: document.getElementById('newBookingDate').value,
-            cleaner: document.getElementById('newBookingCleaner').value,
             status: 'Pending',
-            notes: document.getElementById('newBookingNotes').value,
-            admin_notes: '',
-            whatsapp_confirmed: false
+            notes: document.getElementById('newBookingNotes').value
         };
 
         try {
-            let { error } = await supabase
+            const { error } = await supabase
                 .from('bookings')
                 .insert([newBooking]);
 
-            if (error) {
-                if (isMissingCleanerColumn(error)) {
-                    const fallbackBooking = {
-                        name: newBooking.name,
-                        email: newBooking.email,
-                        phone: newBooking.phone,
-                        service: newBooking.service,
-                        date: newBooking.date,
-                        status: newBooking.status,
-                        notes: newBooking.notes
-                    };
-                    const fallback = await supabase.from('bookings').insert([fallbackBooking]);
-                    if (fallback.error) throw fallback.error;
-                } else {
-                    throw error;
-                }
-            }
+            if (error) throw error;
 
             showToast('Booking created successfully!', 'success');
-            await sendEmailNotifications('new-booking', newBooking);
             await loadDashboardData();
             closeNewBookingModal();
             newBookingForm.reset();
@@ -761,22 +539,16 @@ async function initCalendar() {
     // Get bookings for calendar
     let bookedDays = [];
     try {
-        const { data: bookings, error } = await applyRoleFilter(
-            supabase
-                .from('bookings')
-                .select('date, status')
-                .gte('date', new Date().toISOString().split('T')[0])
-        );
+        const { data: bookings, error } = await supabase
+            .from('bookings')
+            .select('date')
+            .gte('date', new Date().toISOString().split('T')[0]);
 
         if (!error && bookings) {
             bookedDays = bookings.map(b => new Date(b.date).getDate());
         }
     } catch (e) {
         console.error('Error loading calendar data:', e);
-        if (isCleanerSession && isMissingCleanerColumn(e) && !cleanerFilterDisabled) {
-            cleanerFilterDisabled = true;
-            return initCalendar();
-        }
     }
 
     const today = new Date().getDate();
@@ -802,91 +574,46 @@ async function initCalendar() {
 // --- Charts Logic ---
 async function initCharts() {
     const ctx = document.getElementById('reportsChart');
-    if (!ctx || typeof Chart === 'undefined') {
-        console.warn('Chart.js not available; analytics skipped.');
-        return;
-    }
+    if (!ctx) return;
 
     // Destroy existing chart if any
     if (window.myChart) {
         window.myChart.destroy();
     }
 
-    // Build last 6 months labels
-    const now = new Date();
-    const monthLabels = [];
-    for (let i = 5; i >= 0; i--) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        monthLabels.push(d.toLocaleString('en-GB', { month: 'short' }));
-    }
-
-    const statusBuckets = {
-        Pending: Array(6).fill(0),
-        Confirmed: Array(6).fill(0),
-        Completed: Array(6).fill(0),
-        Cancelled: Array(6).fill(0)
-    };
-
+    // Get booking stats by month
+    let monthlyData = [0, 0, 0, 0, 0, 0];
     try {
-        const { data: bookings, error } = await applyRoleFilter(
-            supabase.from('bookings').select('date, status')
-        );
+        const { data: bookings, error } = await supabase
+            .from('bookings')
+            .select('date, status');
 
         if (!error && bookings) {
             bookings.forEach(b => {
-                const bookingDate = new Date(b.date);
-                const diffMonths = (now.getFullYear() - bookingDate.getFullYear()) * 12 + (now.getMonth() - bookingDate.getMonth());
-                const bucket = 5 - diffMonths;
-                if (bucket >= 0 && bucket < 6) {
-                    const status = b.status || 'Pending';
-                    if (statusBuckets[status]) {
-                        statusBuckets[status][bucket]++;
-                    }
+                const month = new Date(b.date).getMonth();
+                if (month >= 0 && month < 6) {
+                    monthlyData[month]++;
                 }
             });
         }
     } catch (e) {
         console.error('Error loading chart data:', e);
-        if (isCleanerSession && isMissingCleanerColumn(e) && !cleanerFilterDisabled) {
-            cleanerFilterDisabled = true;
-            return initCharts();
-        }
     }
 
     window.myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: monthLabels,
-            datasets: [
-                {
-                    label: 'Pending',
-                    data: statusBuckets.Pending,
-                    backgroundColor: '#f59e0b'
-                },
-                {
-                    label: 'Confirmed',
-                    data: statusBuckets.Confirmed,
-                    backgroundColor: '#3b82f6'
-                },
-                {
-                    label: 'Completed',
-                    data: statusBuckets.Completed,
-                    backgroundColor: '#10b981'
-                },
-                {
-                    label: 'Cancelled',
-                    data: statusBuckets.Cancelled,
-                    backgroundColor: '#ef4444'
-                }
-            ]
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Bookings per Month',
+                data: monthlyData,
+                backgroundColor: '#3b82f6',
+                borderColor: '#0f172a',
+                borderWidth: 1
+            }]
         },
         options: {
             responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            },
             scales: {
                 y: {
                     beginAtZero: true,
@@ -897,135 +624,6 @@ async function initCharts() {
             }
         }
     });
-}
-
-// --- Calendar (full view) ---
-async function renderFullCalendar() {
-    const container = document.getElementById('fullCalendar');
-    if (!container) return;
-    container.innerHTML = '<div class="loading">Loading calendar...</div>';
-
-    const today = new Date();
-    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-
-    try {
-        const { data: bookings, error } = await applyRoleFilter(
-            supabase
-                .from('bookings')
-                .select('*')
-                .gte('date', startOfMonth.toISOString().split('T')[0])
-                .lte('date', endOfMonth.toISOString().split('T')[0])
-                .order('date', { ascending: true })
-        );
-
-        if (error) throw error;
-
-        const daysInMonth = endOfMonth.getDate();
-        const startDay = startOfMonth.getDay(); // 0-6
-        const eventsByDay = {};
-        (bookings || []).forEach(b => {
-            const dayNum = new Date(b.date).getDate();
-            if (!eventsByDay[dayNum]) eventsByDay[dayNum] = [];
-            eventsByDay[dayNum].push(b);
-        });
-
-        const cells = [];
-        for (let i = 0; i < startDay; i++) {
-            cells.push('<div class="full-cal-day empty"></div>');
-        }
-
-        for (let day = 1; day <= daysInMonth; day++) {
-            const events = eventsByDay[day] || [];
-            let eventsHtml = '';
-            events.forEach(ev => {
-                const statusClass = `status-${(ev.status || 'pending').toLowerCase()}`;
-                eventsHtml += `<div class="cal-event ${statusClass}">${ev.service || 'Booking'} - ${ev.cleaner || 'Unassigned'}</div>`;
-            });
-
-            cells.push(`
-                <div class="full-cal-day">
-                    <div class="full-cal-date">${day}</div>
-                    <div class="full-cal-events">
-                        ${eventsHtml || '<span style="color: var(--text-muted); font-size: 0.85rem;">No bookings</span>'}
-                    </div>
-                </div>
-            `);
-        }
-
-        container.innerHTML = cells.join('');
-    } catch (error) {
-        console.error('Error rendering calendar', error);
-        if (isCleanerSession && isMissingCleanerColumn(error) && !cleanerFilterDisabled) {
-            cleanerFilterDisabled = true;
-            return renderFullCalendar();
-        }
-        container.innerHTML = '<div style="color:red; padding:16px;">Failed to load calendar</div>';
-    }
-}
-
-// --- Export ---
-async function exportBookings(format = 'csv') {
-    try {
-        const { data: bookings, error } = await buildBookingsQuery({ withCount: false });
-        if (error) throw error;
-        const rows = bookings || [];
-        const headers = ['Name', 'Email', 'Phone', 'Service', 'Date', 'Cleaner', 'Status', 'Notes', 'Admin Notes'];
-        const csv = [headers.join(',')].concat(
-            rows.map(r => [
-                r.name,
-                r.email,
-                r.phone,
-                r.service,
-                r.date,
-                r.cleaner || '',
-                r.status,
-                (r.notes || '').replace(/,/g, ';'),
-                (r.admin_notes || '').replace(/,/g, ';')
-            ].map(val => `"${(val || '').toString().replace(/"/g, '""')}"`).join(','))
-        ).join('\n');
-
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.href = url;
-        link.download = `bookings-${new Date().toISOString().split('T')[0]}.${format === 'excel' ? 'csv' : 'csv'}`;
-        link.click();
-        URL.revokeObjectURL(url);
-        showToast('Export ready – CSV downloaded', 'success');
-    } catch (error) {
-        console.error('Export error', error);
-        showToast('Failed to export bookings', 'error');
-    }
-}
-
-// --- Notifications ---
-async function sendEmailNotifications(type, payload) {
-    // Placeholder: wire to real email service or Supabase function.
-    console.log('Email notification stub:', type, payload);
-}
-
-async function sendWhatsappConfirmation() {
-    if (!currentBookingData || !currentBookingId) return;
-    const phoneDigits = normalizePhone(currentBookingData.phone);
-    if (!phoneDigits) {
-        showToast('No phone number available for WhatsApp', 'error');
-        return;
-    }
-    const statusSelect = document.getElementById('modalStatusSelect');
-    const statusToSave = statusSelect?.value || currentBookingData.status || 'Pending';
-    const message = encodeURIComponent(
-        `Hi ${currentBookingData.name || ''}, your booking on ${formatDate(currentBookingData.date)} is confirmed. - Done & Dusted`
-    );
-    const url = `https://wa.me/${phoneDigits}?text=${message}`;
-    window.open(url, '_blank');
-    const chk = document.getElementById('modalWhatsappConfirmed');
-    if (chk) chk.checked = true;
-    await updateBookingStatus(currentBookingId, statusToSave);
-}
-
-function normalizePhone(phone) {
-    return (phone || '').replace(/\D/g, '');
 }
 
 // --- Helper Functions ---
