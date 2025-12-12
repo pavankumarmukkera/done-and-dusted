@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | Done & Dusted</title>
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+    <section class="login-section">
+        <div class="login-card">
+            <div class="login-header">
+                <h2>Welcome Back</h2>
+                <p>Sign in to your admin dashboard</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginId">
+                        <i class="fas fa-user" style="margin-right: 6px; color: var(--accent);"></i>
+                        <span id="loginIdLabel">Username or Email</span>
+                    </label>
+                    <input type="text" id="loginId" placeholder="username or email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock" style="margin-right: 6px; color: var(--accent);"></i>
+                        Password
+                    </label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">
+                        <i class="fas fa-user-shield" style="margin-right: 6px; color: var(--accent);"></i>
+                        Login as
+                    </label>
+                    <select id="role" required>
+                        <option value="admin">Admin</option>
+                        <option value="cleaner">Cleaner</option>
+                    </select>
+                    <small style="color: var(--text-muted);">Cleaners see only their assigned jobs.</small>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top: 8px; padding: 14px;">
+                    <i class="fas fa-arrow-right"></i> Sign In
+                </button>
+            </form>
+            <div style="margin-top: 28px; text-align: center;">
+                <a href="index.html"
+                    style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: color 0.3s;">
+                    <i class="fas fa-arrow-left" style="margin-right: 6px;"></i> Back to Website
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/admin.js"></script>
+    <script>
+        const roleSelect = document.getElementById('role');
+        const loginIdInput = document.getElementById('loginId');
+        const loginIdLabel = document.getElementById('loginIdLabel');
+
+        roleSelect.addEventListener('change', () => {
+            if (roleSelect.value === 'cleaner') {
+                loginIdLabel.textContent = 'Username';
+                loginIdInput.type = 'text';
+                loginIdInput.placeholder = 'Enter your username';
+            } else {
+                loginIdLabel.textContent = 'Email';
+                loginIdInput.type = 'email';
+                loginIdInput.placeholder = 'you@example.com';
+            }
+        });
+    </script>
+</body>
+
+</html>
