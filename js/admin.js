@@ -502,7 +502,7 @@ async function loadDashboardData() {
         renderBookingsTable(bookingsRes.data, bookingsRes.count);
 
     } catch (error) {
-        console.error('Error loading dashboard data:', error);
+        console.error('Error loading dashboard data:', error.message, error.stack);
         if (isCleanerSession && isMissingCleanerColumn(error) && !cleanerFilterDisabled) {
             cleanerFilterDisabled = true;
             return loadDashboardData();
